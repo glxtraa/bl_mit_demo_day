@@ -5,6 +5,8 @@ const root = process.cwd();
 const sourceCsv = path.join(root, 'Background/Schools/school-data.csv');
 const outDir = path.join(root, 'public/data');
 const technicalPilotRoot = path.join(root, 'Background/Schools/BL_IU_Technical/Piloto escuelas');
+const SCHOOL_PROJECT_TYPE = 'captacion_agua_de_lluvia_scall';
+const SCHOOL_PROJECT_TYPE_LABEL = 'Captación de agua de lluvia (SCALL)';
 
 function parseCsv(text) {
   const rows = [];
@@ -264,7 +266,8 @@ const schools = records.map((record, index) => {
     schoolName,
     municipio,
     estado,
-    projectType: index % 2 === 0 ? 'leak_reduction_efficiency' : 'desalination_treatment',
+    projectType: SCHOOL_PROJECT_TYPE,
+    projectTypeLabel: SCHOOL_PROJECT_TYPE_LABEL,
     projectStatus: 'under_review',
     basinId: municipio.toUpperCase().replace(/\s+/g, '-'),
     operator: record.NOMBRE_DE_QUIEN_REGISTRA || 'Unknown',

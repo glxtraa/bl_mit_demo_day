@@ -2,7 +2,7 @@
   {
     "projectId": "BL-PROJ-001",
     "projectName": "PRIMARIA BENITO JUAREZ",
-    "projectType": "leak_reduction_efficiency",
+    "projectType": "captacion_agua_de_lluvia_scall",
     "location": {
       "basinId": "ECATEPEC-DE-MORELOS",
       "municipality": "ECATEPEC DE MORELOS",
@@ -33,7 +33,7 @@
   {
     "projectId": "BL-PROJ-002",
     "projectName": "SECUNDARIA OFTV NO.0194 GRAL EMILIANO ZAPATA",
-    "projectType": "desalination_treatment",
+    "projectType": "captacion_agua_de_lluvia_scall",
     "location": {
       "basinId": "TLALMANALCO",
       "municipality": "TLALMANALCO",
@@ -65,7 +65,7 @@
   {
     "projectId": "BL-PROJ-003",
     "projectName": "PREPARATORIA OFICIAL NO 271",
-    "projectType": "leak_reduction_efficiency",
+    "projectType": "captacion_agua_de_lluvia_scall",
     "location": {
       "basinId": "AMECAMECA",
       "municipality": "AMECAMECA",
@@ -97,7 +97,7 @@
   {
     "projectId": "BL-PROJ-004",
     "projectName": "PRIMARIA VICENTE GUERRERO",
-    "projectType": "desalination_treatment",
+    "projectType": "captacion_agua_de_lluvia_scall",
     "location": {
       "basinId": "CHALCO",
       "municipality": "CHALCO",
@@ -129,7 +129,7 @@
   {
     "projectId": "BL-PROJ-005",
     "projectName": "TELESECUNDARIA IGNACIO ALLENDE",
-    "projectType": "leak_reduction_efficiency",
+    "projectType": "captacion_agua_de_lluvia_scall",
     "location": {
       "basinId": "CHALCO",
       "municipality": "CHALCO",
@@ -161,7 +161,7 @@
   {
     "projectId": "BL-PROJ-006",
     "projectName": "PREESCOLAR RICARDO FLORES MAGON",
-    "projectType": "desalination_treatment",
+    "projectType": "captacion_agua_de_lluvia_scall",
     "location": {
       "basinId": "LA-PAZ",
       "municipality": "LA PAZ",

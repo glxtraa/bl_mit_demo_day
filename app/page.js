@@ -9,6 +9,8 @@ const BUYERS = [
 ];
 
 const METHOD_VERSION = 'VWBA-0.9-demo';
+const SCHOOL_PROJECT_TYPE = 'captacion_agua_de_lluvia_scall';
+const SCHOOL_PROJECT_TYPE_LABEL = 'Captación de agua de lluvia (SCALL)';
 
 function fmt(n) {
   return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -43,7 +45,7 @@ export default function Page() {
   const [retirePurpose, setRetirePurpose] = useState('Demo day retirement claim');
   const [newProject, setNewProject] = useState({
     projectName: '',
-    projectType: 'leak_reduction_efficiency',
+    projectType: SCHOOL_PROJECT_TYPE,
     basinId: '',
     lat: '',
     lon: ''
@@ -130,6 +132,7 @@ export default function Page() {
       projectId: id,
       projectName: newProject.projectName,
       projectType: newProject.projectType,
+      projectTypeLabel: SCHOOL_PROJECT_TYPE_LABEL,
       location: {
         basinId: newProject.basinId || 'UNIDENTIFIED',
         municipality: 'Custom',
@@ -148,13 +151,13 @@ export default function Page() {
     };
     setProjects((p) => [created, ...p]);
     setSelectedProjectId(id);
-    setNewProject({ projectName: '', projectType: 'leak_reduction_efficiency', basinId: '', lat: '', lon: '' });
+    setNewProject({ projectName: '', projectType: SCHOOL_PROJECT_TYPE, basinId: '', lat: '', lon: '' });
     addTimeline(`Created project ${id} (${created.projectName}).`);
     recordAudit({ type: 'project_created', projectId: id, projectName: created.projectName });
   }
 
   function runAiReviewRecommendation(project) {
-    const recommendation = project.projectType === 'desalination_treatment' ? 'VWBA.TREATMENT.01' : 'VWBA.EFFICIENCY.02';
+    const recommendation = 'VWBA.RWH.01';
     const missing = project.evidenceFiles?.length ? [] : ['At least one evidence document'];
     const confidence = missing.length ? 0.66 : 0.91;
     return {
@@ -162,9 +165,7 @@ export default function Page() {
       confidence,
       missing,
       summary:
-        recommendation === 'VWBA.TREATMENT.01'
-          ? 'Method suggests treatment outcomes with volumetric compliance checks.'
-          : 'Method suggests avoided-loss / efficiency outcomes from monitored usage deltas.'
+        'Method suggests rainwater harvesting outcomes with volumetric compliance checks for SCALL.'
     };
   }
 
@@ -403,8 +404,7 @@ export default function Page() {
               value={newProject.projectType}
               onChange={(e) => setNewProject((x) => ({ ...x, projectType: e.target.value }))}
             >
-              <option value="leak_reduction_efficiency">Leak reduction / efficiency</option>
-              <option value="desalination_treatment">Desalination / treatment</option>
+              <option value={SCHOOL_PROJECT_TYPE}>{SCHOOL_PROJECT_TYPE_LABEL}</option>
             </select>
           </div>
           <div className="row">
@@ -424,7 +424,7 @@ export default function Page() {
                 <strong>{p.projectId}</strong> · {p.projectName}
                 <div>
                   <span className={`badge ${statusBadge(p.status)}`}>{p.status}</span>{' '}
-                  <span className="badge info">{p.projectType}</span>{' '}
+                  <span className="badge info">{p.projectTypeLabel || SCHOOL_PROJECT_TYPE_LABEL}</span>{' '}
                   <span className="badge info">{p.location?.basinId}</span>
                 </div>
                 <button className="secondary" onClick={() => setSelectedProjectId(p.projectId)}>
@@ -477,7 +477,50 @@ export default function Page() {
                 {selectedTechnical.precipitation?.stationLon ?? 'N/A'} · Peak cumulative day value:{' '}
                 {fmt(selectedTechnical.precipitation?.maxDailyMm || 0)} mm
               </p>
-              <div className="code">{JSON.stringify(selectedTechnical.reportFiles || [], null, 2)}</div>
+              <div className="list" style={{ maxHeight: 210 }}>
+                {(selectedTechnical.reportFiles || []).map((file) => (
+                  <div className="item" key={file.path}>
+                    <strong>{file.name}</strong>
+                    <div className="row" style={{ marginTop: 6 }}>
+                      <a
+                        href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                ))}
+                {selectedTechnical.precipitation?.sourceFile ? (
+                  <div className="item">
+                    <strong>Precipitation CSV</strong>
+                    <div className="row" style={{ marginTop: 6 }}>
+                      <a
+                        href={`/api/dossier-file?path=${encodeURIComponent(selectedTechnical.precipitation.sourceFile)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
+                {(selectedTechnical.photoSamples || []).map((photoPath) => (
+                  <div className="item" key={photoPath}>
+                    <strong>{photoPath.split('/').pop()}</strong>
+                    <div className="row" style={{ marginTop: 6 }}>
+                      <a
+                        href={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </>
           )}
         </div>
