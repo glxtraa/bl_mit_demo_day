@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blue Lifeline — Brand Guidelines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #050c1a;
+      --dark:    #0b1629;
+      --mid:     #0f2040;
+      --blue:    #1565c0;
+      --bright:  #2196f3;
+      --sky:     #64b5f6;
+      --white:   #f0f6ff;
+      --muted:   #7ea8cc;
+      --accent:  #00b0ff;
+      --border:  rgba(100,181,246,0.18);
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── COVER ── */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 80px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #050c1a 0%, #0a1f3d 60%, #0e2a52 100%);
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 80% 40%, rgba(33,150,243,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cover-tag {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      display: inline-block;
+    }
+    .cover h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(52px, 7vw, 96px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .cover h1 span { color: var(--accent); }
+    .cover .sub {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--muted);
+      margin-bottom: 48px;
+      max-width: 420px;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 40px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .cover-meta strong { color: var(--white); display: block; font-size: 14px; letter-spacing: 0; text-transform: none; margin-bottom: 4px; }
+    .water-ring {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 560px;
+      height: 560px;
+      border-radius: 50%;
+      border: 1px solid rgba(33,150,243,0.15);
+      box-shadow: inset 0 0 80px rgba(33,150,243,0.06), 0 0 120px rgba(33,150,243,0.08);
+    }
+    .water-ring::before {
+      content: '';
+      position: absolute;
+      inset: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(33,150,243,0.1);
+    }
+    .water-ring::after {
+      content: '';
+      position: absolute;
+      inset: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,176,255,0.12) 0%, transparent 70%);
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 80px 80px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 40px;
+    }
+    h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--white);
+    }
+    p { color: var(--muted); max-width: 640px; margin-bottom: 16px; }
+
+    /* ── MISSION ── */
+    .mission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 40px;
+    }
+    .mission-card {
+      background: var(--dark);
+      padding: 36px;
+      border: 1px solid var(--border);
+    }
+    .mission-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .mission-card h3 { font-size: 16px; margin-bottom: 8px; }
+    .mission-card p { font-size: 14px; max-width: 100%; margin: 0; }
+
+    /* ── COLORS ── */
+    .color-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .swatch {
+      width: 160px;
+    }
+    .swatch-block {
+      height: 100px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .swatch-block::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%);
+    }
+    .swatch h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .swatch span {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .color-usage {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .color-usage .col h4 { font-size: 13px; color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+    .color-usage .col p { font-size: 13px; max-width: 100%; color: var(--muted); margin: 0; }
+
+    /* ── TYPOGRAPHY ── */
+    .type-showcase {
+      margin-bottom: 40px;
+    }
+    .type-block {
+      padding: 36px;
+      background: var(--dark);
+      border: 1px solid var(--border);
+      margin-bottom: 2px;
+    }
+    .type-block .label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; font-family: 'Syne', sans-serif; }
+    .display-sample { font-family: 'Syne', sans-serif; font-size: clamp(36px, 5vw, 64px); font-weight: 800; line-height: 1.0; letter-spacing: -0.02em; color: var(--white); }
+    .heading-sample { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--white); }
+    .subheading-sample { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--sky); letter-spacing: 0.02em; }
+    .body-sample { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--muted); line-height: 1.7; max-width: 580px; }
+    .caption-sample { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .type-meta { font-size: 12px; color: rgba(126,168,204,0.5); margin-top: 12px; font-family: 'DM Sans', sans-serif; }
+
+    /* ── VOICE ── */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-bottom: 32px;
+    }
+    .voice-card {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      padding: 28px;
+    }
+    .voice-card .tag {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding: 4px 10px;
+      display: inline-block;
+      border-radius: 2px;
+    }
+    .tag-do { background: rgba(0,176,255,0.15); color: var(--accent); }
+    .tag-dont { background: rgba(255,80,80,0.12); color: #ff6b6b; }
+    .voice-card p { font-size: 14px; max-width: 100%; margin: 0; }
+    .dos-donts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .col-list h4 { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+    .col-list.do h4 { color: var(--accent); }
+    .col-list.dont h4 { color: #ff6b6b; }
+    .col-list ul { list-style: none; }
+    .col-list ul li { font-size: 14px; color: var(--muted); padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px; }
+    .col-list ul li::before { flex-shrink: 0; margin-top: 2px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+    .col-list.do ul li::before { content: '✓'; background: rgba(0,176,255,0.15); color: var(--accent); }
+    .col-list.dont ul li::before { content: '✕'; background: rgba(255,80,80,0.12); color: #ff6b6b; }
+
+    /* ── IMAGERY ── */
+    .imagery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-bottom: 32px;
+    }
+    .imagery-card {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      padding: 28px;
+    }
+    .imagery-card .img-placeholder {
+      height: 120px;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .imagery-card h3 { font-size: 15px; margin-bottom: 8px; }
+    .imagery-card p { font-size: 13px; max-width: 100%; margin: 0; }
+
+    /* ── LOGO ── */
+    .logo-section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 32px;
+    }
+    .logo-display {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .logo-text span { color: var(--accent); }
+    .logo-text-dark {
+      background: var(--white);
+      padding: 32px 48px;
+      color: var(--navy);
+      border-radius: 2px;
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+    }
+    .logo-text-dark span { color: var(--blue); }
+    .logo-rules { background: var(--dark); border: 1px solid var(--border); padding: 32px; }
+    .logo-rules ul { list-style: none; }
+    .logo-rules ul li { font-size: 14px; color: var(--muted); padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+    .logo-rules ul li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+
+    /* ── BUTTONS ── */
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--navy);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 14px 28px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid var(--white);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 13px 28px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 13px 28px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+    .btn-dark {
+      background: var(--mid);
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── TAGLINES ── */
+    .tagline-block {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      padding: 32px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .tagline-block .num {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+      width: 24px;
+    }
+    .tagline-block .tag-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .tagline-block .tag-note {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      max-width: 160px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 60px 80px;
+      background: #020810;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .footer-brand { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+    .footer-brand span { color: var(--accent); }
+    .footer-meta { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.8; }
+
+    @media (max-width: 768px) {
+      section, .cover, .footer { padding: 48px 24px; }
+      .mission-grid, .voice-grid, .dos-donts, .logo-section-grid, .imagery-grid, .color-usage { grid-template-columns: 1fr; }
+      .water-ring { display: none; }
+      .cover h1 { font-size: 44px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-tag">Brand Guidelines · 2026</div>
+    <h1>Blue<br/><span>Lifeline</span></h1>
+    <p class="sub">The Standard for Water Sustainability</p>
+    <div class="cover-meta">
+      <div><strong>Version</strong>1.0</div>
+      <div><strong>Domain</strong>bluelifeline.org</div>
+      <div><strong>Category</strong>Water · ESG · Web3</div>
+    </div>
+    <div class="water-ring"></div>
+  </div>
+
+  <!-- MISSION & BRAND ESSENCE -->
+  <section>
+    <div class="section-label">01 — Brand Foundation</div>
+    <h2>Who We Are</h2>
+    <p>Blue Lifeline is a water sustainability platform that issues verified Water Benefit Tokens (WBTs) — each representing one cubic meter of certified water benefit. The brand sits at the intersection of environmental impact, blockchain technology, and ESG finance.</p>
+    <div class="mission-grid">
+      <div class="mission-card">
+        <div class="icon">🌊</div>
+        <h3>Mission</h3>
+        <p>Enable companies and developers to become credibly water positive by connecting corporate demand to verified, real-world water impact projects.</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">🎯</div>
+        <h3>Vision</h3>
+        <p>A world where every cubic meter of water use is accountable, measurable, and offset — creating a net positive impact on global water security.</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">⛓️</div>
+        <h3>Product</h3>
+        <p>Water Benefit Tokens (WBTs) on blockchain, certified under the Volumetric Water Benefit Accounting (VWBA) standard. Measured. Verified. Auditable.</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">✦</div>
+        <h3>Brand Promise</h3>
+        <p>Credibility above all. Every token is backed by IoT-measured, third-party verified, blockchain-traced water data — no greenwashing possible.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLORS -->
+  <section>
+    <div class="section-label">02 — Color System</div>
+    <h2>Color Palette</h2>
+    <p>The palette is built on deep oceanic dark backgrounds with electric blue as the hero accent — communicating depth, trust, precision, and water.</p>
+
+    <div class="color-row">
+      <div class="swatch">
+        <div class="swatch-block" style="background:#050c1a;"></div>
+        <h4>Deep Ocean</h4>
+        <span>#050C1A</span><br/>
+        <span style="font-size:11px;">Primary Background</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#0b1629;"></div>
+        <h4>Dark Navy</h4>
+        <span>#0B1629</span><br/>
+        <span style="font-size:11px;">Surface / Card</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#0f2040;"></div>
+        <h4>Midnight Blue</h4>
+        <span>#0F2040</span><br/>
+        <span style="font-size:11px;">Section Background</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#00b0ff;"></div>
+        <h4>Electric Water</h4>
+        <span>#00B0FF</span><br/>
+        <span style="font-size:11px;">Primary Accent</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#2196f3;"></div>
+        <h4>Core Blue</h4>
+        <span>#2196F3</span><br/>
+        <span style="font-size:11px;">Interactive / CTA</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#64b5f6;"></div>
+        <h4>Sky Blue</h4>
+        <span>#64B5F6</span><br/>
+        <span style="font-size:11px;">Subheadings / Muted</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#f0f6ff;"></div>
+        <h4>Ice White</h4>
+        <span>#F0F6FF</span><br/>
+        <span style="font-size:11px;">Primary Text</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#7ea8cc;"></div>
+        <h4>Cool Mist</h4>
+        <span>#7EA8CC</span><br/>
+        <span style="font-size:11px;">Body Text / Muted</span>
+      </div>
+    </div>
+
+    <div class="color-usage">
+      <div class="col">
+        <h4>Dark Surfaces</h4>
+        <p>Deep Ocean and Dark Navy form all page backgrounds, cards, and sections. Never use white or light backgrounds as the primary canvas.</p>
+      </div>
+      <div class="col">
+        <h4>Blue Accents</h4>
+        <p>Electric Water (#00B0FF) is the signature accent — use for key CTAs, highlights, links, and brand marks. Core Blue for interactive elements.</p>
+      </div>
+      <div class="col">
+        <h4>Text Hierarchy</h4>
+        <p>Ice White for primary headings; Cool Mist for body copy; Sky Blue for subheadings. Text always appears on dark backgrounds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section>
+    <div class="section-label">03 — Typography</div>
+    <h2>Type System</h2>
+    <p>Typography uses two families: <strong>Syne</strong> for all display, headings, and brand moments — and <strong>DM Sans</strong> for body copy and technical content. The combination projects authority and readability.</p>
+
+    <div class="type-showcase">
+      <div class="type-block">
+        <div class="label">Display / Hero — Syne 800</div>
+        <div class="display-sample">Become Water<br/>Positive. Credibly.</div>
+        <div class="type-meta">Syne · ExtraBold · Tracking −0.02em · Used for hero headlines and major statements</div>
+      </div>
+      <div class="type-block">
+        <div class="label">Heading — Syne 700</div>
+        <div class="heading-sample">Verified Water Benefit Tokens</div>
+        <div class="type-meta">Syne · Bold · Section headings and feature titles</div>
+      </div>
+      <div class="type-block">
+        <div class="label">Subheading — Syne 600</div>
+        <div class="subheading-sample">VWBA-Certified · Blockchain Tokenised · Auditable</div>
+        <div class="type-meta">Syne · SemiBold · Tracking +0.02em · Labels and category tags</div>
+      </div>
+      <div class="type-block">
+        <div class="label">Body — DM Sans 400</div>
+        <div class="body-sample">Each token represents exactly one cubic metre of water benefit, certified under the VWBA standard so companies can trust the impact is real and measurable.</div>
+        <div class="type-meta">DM Sans · Regular · 16px / 1.7 line-height · All body content</div>
+      </div>
+      <div class="type-block">
+        <div class="label">Caption / Label — DM Sans 400</div>
+        <div class="caption-sample">IoT Metered · Step 1 · Water Benefit Token · ESG Report</div>
+        <div class="type-meta">DM Sans · Regular · 11–12px · Letter-spacing 0.08–0.25em · All caps for labels</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAGLINES -->
+  <section>
+    <div class="section-label">04 — Key Messaging</div>
+    <h2>Brand Language</h2>
+    <p>All language should communicate credibility, precision, and impact. Avoid vague sustainability language — every claim is backed by measurement.</p>
+
+    <div class="tagline-block">
+      <span class="num">01</span>
+      <span class="tag-text">Become Water Positive. Credibly.</span>
+      <span class="tag-note">Primary headline / hero CTA</span>
+    </div>
+    <div class="tagline-block">
+      <span class="num">02</span>
+      <span class="tag-text">The Standard for Water Sustainability</span>
+      <span class="tag-note">Tagline / footer positioning</span>
+    </div>
+    <div class="tagline-block">
+      <span class="num">03</span>
+      <span class="tag-text">Measured. Verified. Auditable.</span>
+      <span class="tag-note">Product credibility statement</span>
+    </div>
+    <div class="tagline-block">
+      <span class="num">04</span>
+      <span class="tag-text">Turn Commitments Into Measurable Results</span>
+      <span class="tag-note">Value proposition / closing CTA</span>
+    </div>
+    <div class="tagline-block" style="margin-bottom:32px;">
+      <span class="num">05</span>
+      <span class="tag-text">Offset Water Use With Impact</span>
+      <span class="tag-note">Secondary marketing message</span>
+    </div>
+
+    <div class="dos-donts">
+      <div class="col-list do">
+        <h4>✓ Use</h4>
+        <ul>
+          <li>Specific, measurable terms (m³, cubic meters, IoT-metered)</li>
+          <li>Credentialed language referencing VWBA certification</li>
+          <li>Active, confident verbs: measure, verify, certify, offset, tokenise</li>
+          <li>Technical precision that signals expertise</li>
+          <li>ESG and sustainability finance terminology</li>
+          <li>Corporate-facing, results-oriented copy</li>
+        </ul>
+      </div>
+      <div class="col-list dont">
+        <h4>✕ Avoid</h4>
+        <ul>
+          <li>Vague green language: "eco-friendly", "sustainable future", "going green"</li>
+          <li>Unverified superlatives without data to support them</li>
+          <li>Emotional or sentimental appeals divorced from facts</li>
+          <li>Consumer-facing casual tone</li>
+          <li>Carbon credit analogies without clarification</li>
+          <li>Passive voice or hedged commitments</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGO USAGE -->
+  <section>
+    <div class="section-label">05 — Logo</div>
+    <h2>Logo Usage</h2>
+    <p>The Blue Lifeline logo consists of the wordmark paired with a droplet/wave icon. It is always reproduced in its approved colour combinations only.</p>
+
+    <div class="logo-section-grid" style="margin-bottom:16px;">
+      <div class="logo-display" style="background:var(--dark);">
+        <div class="section-label" style="margin:0;font-size:10px;">Primary — Dark Background</div>
+        <div class="logo-text">💧 <span>Blue</span> Lifeline</div>
+      </div>
+      <div class="logo-display" style="background:#f0f6ff;">
+        <div class="section-label" style="margin:0;font-size:10px;color:var(--blue);">Reverse — Light Background</div>
+        <div class="logo-text-dark">💧 <span>Blue</span> Lifeline</div>
+      </div>
+    </div>
+
+    <div class="logo-rules">
+      <h3 style="margin-bottom:20px;">Logo Rules</h3>
+      <ul>
+        <li>Always use the primary version (white wordmark on dark) as the default.</li>
+        <li>A dark-on-light version is available for print or light-background contexts.</li>
+        <li>Maintain clear space of at least 1× the logo height on all sides.</li>
+        <li>Never recolour the logo outside the approved palette.</li>
+        <li>Never stretch, rotate, or apply drop shadows to the logo.</li>
+        <li>Never use the wordmark without its accompanying icon/mark.</li>
+        <li>Minimum digital size: 120px wide. Minimum print size: 25mm wide.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- IMAGERY -->
+  <section>
+    <div class="section-label">06 — Imagery & Photography</div>
+    <h2>Visual Language</h2>
+    <p>Photography should evoke abundance and scarcity in equal measure — communicating the urgency of the water challenge alongside the tangibility of Blue Lifeline's solutions.</p>
+
+    <div class="imagery-grid">
+      <div class="imagery-card">
+        <div class="img-placeholder" style="background:linear-gradient(135deg,#0a1f3d,#1565c0);">🌊</div>
+        <h3>Water in Scale</h3>
+        <p>Vast bodies of water, ocean horizons, and dramatic cloudscapes. Wide, awe-inspiring shots that communicate the magnitude of the water challenge.</p>
+      </div>
+      <div class="imagery-card">
+        <div class="img-placeholder" style="background:linear-gradient(135deg,#0f2040,#2196f3);">💧</div>
+        <h3>Water Micro-Detail</h3>
+        <p>Water drops on glass, surface texture, ripples and flow. Close-up shots that reinforce precision, measurement, and the scientific nature of verification.</p>
+      </div>
+      <div class="imagery-card">
+        <div class="img-placeholder" style="background:linear-gradient(135deg,#0b1629,#00b0ff);">🏗️</div>
+        <h3>Infrastructure & Projects</h3>
+        <p>Sprinklers, water treatment plants, pipelines, and agricultural systems. Photos of real projects that make the impact tangible and credible.</p>
+      </div>
+    </div>
+
+    <div class="color-usage">
+      <div class="col">
+        <h4>Dark Overlays</h4>
+        <p>All photographic backgrounds use dark overlays or are naturally dark/moody to maintain contrast with white text and the brand's dark aesthetic.</p>
+      </div>
+      <div class="col">
+        <h4>Blue-Cool Tones</h4>
+        <p>Select imagery with cool, blue-leaning colour temperatures. Avoid warm or golden-hour tones — they conflict with the brand's oceanic palette.</p>
+      </div>
+      <div class="col">
+        <h4>Authenticity</h4>
+        <p>Use real project and field photography wherever possible. The brand's credibility story depends on showing genuine infrastructure and impact.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUTTONS & UI -->
+  <section>
+    <div class="section-label">07 — UI Components</div>
+    <h2>Buttons & Controls</h2>
+    <p>All interactive elements use sharp corners (no border-radius), conveying precision and technical authority. Buttons use Syne font, uppercase tracking.</p>
+
+    <div class="button-row">
+      <button class="btn-primary">Contact Us</button>
+      <button class="btn-outline">Explore Marketplace</button>
+      <button class="btn-ghost">Certify Your Project</button>
+      <button class="btn-dark">Explore Projects</button>
+    </div>
+
+    <div class="color-usage">
+      <div class="col">
+        <h4>Primary CTA</h4>
+        <p>Electric Water (#00B0FF) fill with navy text. Used for the single most important action on a page — "Contact Us", "Get Started".</p>
+      </div>
+      <div class="col">
+        <h4>Secondary CTA</h4>
+        <p>Outline buttons in white or Electric Water. Used for secondary actions: "Explore Marketplace", "Learn More".</p>
+      </div>
+      <div class="col">
+        <h4>Ghost / Tertiary</h4>
+        <p>Transparent with accent border. Used for developer/partner actions that are important but subordinate to the primary corporate CTA.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERSONALITY -->
+  <section>
+    <div class="section-label">08 — Brand Personality</div>
+    <h2>How We Show Up</h2>
+
+    <div class="voice-grid">
+      <div class="voice-card">
+        <div class="tag tag-do">Authoritative</div>
+        <p>We speak with the confidence of a VWBA-aligned standards body — not a startup. Our credibility is built on measurement, not marketing.</p>
+      </div>
+      <div class="voice-card">
+        <div class="tag tag-do">Technical</div>
+        <p>We use precise language: m³, IoT meters, blockchain tokenisation, VWBA certification. Technical fluency signals genuine expertise.</p>
+      </div>
+      <div class="voice-card">
+        <div class="tag tag-do">Urgent</div>
+        <p>The global water gap is real and growing. We acknowledge the scale of the problem without catastrophising — we're here with a credible solution.</p>
+      </div>
+      <div class="voice-card">
+        <div class="tag tag-do">Transparent</div>
+        <p>Every claim is backed by data. We don't make promises without verification. Auditability and traceability are core to who we are, not features.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>
+      <div class="footer-brand">💧 <span>Blue</span> Lifeline</div>
+      <p style="font-size:13px; color:var(--muted); margin-top:8px; max-width:300px;">The Standard for Water Sustainability</p>
+    </div>
+    <div class="footer-meta">
+      Brand Guidelines v1.0<br/>
+      Derived from bluelifeline.org<br/>
+      © 2026 Blue Lifeline
+    </div>
+  </footer>
+
+</body>
+</html>

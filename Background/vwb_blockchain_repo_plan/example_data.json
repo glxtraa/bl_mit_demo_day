@@ -1,0 +1,126 @@
+{
+  "total_blobs_found": 6,
+  "sscap_records_processed": 6,
+  "data": [
+    {
+      "filename": "sscap/captado/2026-03-20T11-18-58.324Z-d2df08ad-98f1-4e9f-83ac-7310452aa86d.json",
+      "uploadedAt": "2026-03-20T11:18:59.000Z",
+      "content": {
+        "data": {
+          "tlaloque_id": "test-preserved",
+          "pulses": 8,
+          "catched_at": "2024-03-20 16:05:00"
+        },
+        "metadata": {
+          "ip": "95.147.68.4",
+          "city": "Wandsworth",
+          "country": "GB",
+          "userAgent": "curl/8.7.1"
+        },
+        "id": "d2df08ad-98f1-4e9f-83ac-7310452aa86d",
+        "updated_at": "2026-03-20T11:18:58.324Z",
+        "created_at": "2026-03-20T11:18:58.324Z"
+      }
+    },
+    {
+      "filename": "sscap/nivel/2026-03-20T11-18-58.925Z-7b80cd86-f4b1-4c4d-a8fb-1e8b3c46792c.json",
+      "uploadedAt": "2026-03-20T11:18:59.000Z",
+      "content": {
+        "data": {
+          "tlaloque_id": "test-preserved",
+          "meters": 0.75,
+          "catched_at": "2024-03-20 16:10:00"
+        },
+        "metadata": {
+          "ip": "95.147.68.4",
+          "city": "Wandsworth",
+          "country": "GB",
+          "userAgent": "curl/8.7.1"
+        },
+        "id": "7b80cd86-f4b1-4c4d-a8fb-1e8b3c46792c",
+        "updated_at": "2026-03-20T11:18:58.925Z",
+        "created_at": "2026-03-20T11:18:58.925Z"
+      }
+    },
+    {
+      "filename": "sscap/nivel/2026-03-20T11-25-21.758Z-8d08e3ba-d2fb-460e-b725-7fa74a6d5057.json",
+      "uploadedAt": "2026-03-20T11:25:22.000Z",
+      "content": {
+        "data": {
+          "tlaloque_id": "test-1",
+          "meters": 1,
+          "catched_at": "2024-03-20 12:10:00"
+        },
+        "metadata": {
+          "ip": "95.147.68.4",
+          "city": "Wandsworth",
+          "country": "GB",
+          "userAgent": "curl/8.9.1"
+        },
+        "id": "8d08e3ba-d2fb-460e-b725-7fa74a6d5057",
+        "updated_at": "2026-03-20T11:25:21.758Z",
+        "created_at": "2026-03-20T11:25:21.758Z"
+      }
+    },
+    {
+      "filename": "sscap/nivel/2026-03-26T16-00-48.459Z-eca0a78a-3d63-46f7-b0b8-33947b815f55.json",
+      "uploadedAt": "2026-03-26T16:00:49.000Z",
+      "content": {
+        "data": {
+          "tlaloque_id": "test-2",
+          "meters": 1,
+          "catched_at": "2024-03-26 12:10:00"
+        },
+        "metadata": {
+          "ip": "31.51.242.48",
+          "city": "Horsham",
+          "country": "GB",
+          "userAgent": "curl/8.9.1"
+        },
+        "id": "eca0a78a-3d63-46f7-b0b8-33947b815f55",
+        "updated_at": "2026-03-26T16:00:48.459Z",
+        "created_at": "2026-03-26T16:00:48.459Z"
+      }
+    },
+    {
+      "filename": "sscap/utilizado/2026-03-20T11-18-57.677Z-cf891337-2cbe-4694-851a-d3b0ff9737b4.json",
+      "uploadedAt": "2026-03-20T11:18:58.000Z",
+      "content": {
+        "data": {
+          "tlaloque_id": "test-preserved",
+          "pulses": 50,
+          "used_at": "2024-03-20 16:00:00"
+        },
+        "metadata": {
+          "ip": "95.147.68.4",
+          "city": "Wandsworth",
+          "country": "GB",
+          "userAgent": "curl/8.7.1"
+        },
+        "id": "cf891337-2cbe-4694-851a-d3b0ff9737b4",
+        "updated_at": "2026-03-20T11:18:57.677Z",
+        "created_at": "2026-03-20T11:18:57.677Z"
+      }
+    },
+    {
+      "filename": "sscap/utilizado/2026-03-26T16-12-03.313Z-5e42181b-bafa-43fb-ae21-572c77a4d4ae.json",
+      "uploadedAt": "2026-03-26T16:12:04.000Z",
+      "content": {
+        "data": {
+          "tlaloque_id": "027535d4-053b-4160-b324-f396840fcb5e",
+          "pulses": 111.15,
+          "used_at": "2025-04-29 10:00:00"
+        },
+        "metadata": {
+          "ip": "189.139.125.138",
+          "city": "Cuautitl%C3%A1n%20Izcalli",
+          "country": "MX",
+          "userAgent": "PostmanRuntime/7.51.0"
+        },
+        "id": "5e42181b-bafa-43fb-ae21-572c77a4d4ae",
+        "updated_at": "2026-03-26T16:12:03.313Z",
+        "created_at": "2026-03-26T16:12:03.313Z"
+      }
+    }
+  ]
+}

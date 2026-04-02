@@ -1,0 +1,195 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "basinId": "ECATEPEC-DE-MORELOS",
+        "municipality": "ECATEPEC DE MORELOS",
+        "state": "ESTADO DE MEXICO",
+        "schoolCount": 1,
+        "riskClass": 1,
+        "source": "Derived from school clusters for Demo Day map overlay"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -99.154364,
+              19.464180000000002
+            ],
+            [
+              -98.994364,
+              19.464180000000002
+            ],
+            [
+              -98.994364,
+              19.62418
+            ],
+            [
+              -99.154364,
+              19.62418
+            ],
+            [
+              -99.154364,
+              19.464180000000002
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "basinId": "TLALMANALCO",
+        "municipality": "TLALMANALCO",
+        "state": "ESTADO DE MEXICO",
+        "schoolCount": 1,
+        "riskClass": 1,
+        "source": "Derived from school clusters for Demo Day map overlay"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -98.8620067,
+              19.086658300000003
+            ],
+            [
+              -98.7020067,
+              19.086658300000003
+            ],
+            [
+              -98.7020067,
+              19.2466583
+            ],
+            [
+              -98.8620067,
+              19.2466583
+            ],
+            [
+              -98.8620067,
+              19.086658300000003
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "basinId": "AMECAMECA",
+        "municipality": "AMECAMECA",
+        "state": "ESTADO DE MEXICO",
+        "schoolCount": 1,
+        "riskClass": 1,
+        "source": "Derived from school clusters for Demo Day map overlay"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -98.864394,
+              19.003353
+            ],
+            [
+              -98.70439400000001,
+              19.003353
+            ],
+            [
+              -98.70439400000001,
+              19.163352999999997
+            ],
+            [
+              -98.864394,
+              19.163352999999997
+            ],
+            [
+              -98.864394,
+              19.003353
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "basinId": "CHALCO",
+        "municipality": "CHALCO",
+        "state": "ESTADO DE MEXICO",
+        "schoolCount": 2,
+        "riskClass": 2,
+        "source": "Derived from school clusters for Demo Day map overlay"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -98.96979,
+              19.177573
+            ],
+            [
+              -98.7958783,
+              19.177573
+            ],
+            [
+              -98.7958783,
+              19.2923517
+            ],
+            [
+              -98.96979,
+              19.2923517
+            ],
+            [
+              -98.96979,
+              19.177573
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "basinId": "LA-PAZ",
+        "municipality": "LA PAZ",
+        "state": "ESTADO DE MEXICO",
+        "schoolCount": 1,
+        "riskClass": 1,
+        "source": "Derived from school clusters for Demo Day map overlay"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -99.0228083,
+              19.2656217
+            ],
+            [
+              -98.8628083,
+              19.2656217
+            ],
+            [
+              -98.8628083,
+              19.425621699999997
+            ],
+            [
+              -99.0228083,
+              19.425621699999997
+            ],
+            [
+              -99.0228083,
+              19.2656217
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

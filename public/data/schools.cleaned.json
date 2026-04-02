@@ -1,0 +1,158 @@
+[
+  {
+    "schoolId": "15DPR0594Z",
+    "schoolName": "PRIMARIA BENITO JUAREZ",
+    "municipio": "ECATEPEC DE MORELOS",
+    "estado": "ESTADO DE MEXICO",
+    "projectType": "leak_reduction_efficiency",
+    "projectStatus": "under_review",
+    "basinId": "ECATEPEC-DE-MORELOS",
+    "operator": "MARTIN LIEDO",
+    "lat": 19.54418,
+    "lon": -99.074364,
+    "meter": {
+      "deviceId": "tlaloque-15DPR0594Z",
+      "meterNumber": "15DPR0594Z",
+      "status": "online",
+      "latestReadingM3": 257
+    },
+    "evidence": {
+      "photoUrl": "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/748605275/attachments/attan9aYM9pyomUiUWehEwju/",
+      "notes": "TODO FUNCIONA BIEN"
+    },
+    "raw": {
+      "lastFollowUpDate": "2026-02-13",
+      "scallInUse": "SI"
+    }
+  },
+  {
+    "schoolId": "15ETV0293A",
+    "schoolName": "SECUNDARIA OFTV NO.0194 GRAL EMILIANO ZAPATA",
+    "municipio": "TLALMANALCO",
+    "estado": "ESTADO DE MEXICO",
+    "projectType": "desalination_treatment",
+    "projectStatus": "under_review",
+    "basinId": "TLALMANALCO",
+    "operator": "MARTIN LIEDO",
+    "lat": 19.1666583,
+    "lon": -98.7820067,
+    "meter": {
+      "deviceId": "tlaloque-15ETV0293A",
+      "meterNumber": "15ETV0293A",
+      "status": "suspect",
+      "latestReadingM3": 200
+    },
+    "evidence": {
+      "photoUrl": "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/746538703/attachments/attqJHZ6258pANspHn7dHcHo/",
+      "notes": "EL MEDIDOR NO FUNCIONA BIEN SOLO CUANDO SE CORTA A LA MITAD EL FLUJO DE AGUA EMPIEZA A FUNCIONAR"
+    },
+    "raw": {
+      "lastFollowUpDate": "2026-02-05",
+      "scallInUse": "SI"
+    }
+  },
+  {
+    "schoolId": "15EBH0466T",
+    "schoolName": "PREPARATORIA OFICIAL NO 271",
+    "municipio": "AMECAMECA",
+    "estado": "ESTADO DE MEXICO",
+    "projectType": "leak_reduction_efficiency",
+    "projectStatus": "under_review",
+    "basinId": "AMECAMECA",
+    "operator": "MARTIN LIEDO",
+    "lat": 19.083353,
+    "lon": -98.784394,
+    "meter": {
+      "deviceId": "tlaloque-15EBH0466T",
+      "meterNumber": "15EBH0466T",
+      "status": "online",
+      "latestReadingM3": 153
+    },
+    "evidence": {
+      "photoUrl": "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/746539034/attachments/attgHYZspjAYNcoHp89nSGLK/",
+      "notes": "MEDIDOR ANALOGO"
+    },
+    "raw": {
+      "lastFollowUpDate": "2026-02-05",
+      "scallInUse": "SI"
+    }
+  },
+  {
+    "schoolId": "15DPR0454Z",
+    "schoolName": "PRIMARIA VICENTE GUERRERO",
+    "municipio": "CHALCO",
+    "estado": "ESTADO DE MEXICO",
+    "projectType": "desalination_treatment",
+    "projectStatus": "under_review",
+    "basinId": "CHALCO",
+    "operator": "MARTIN LIEDO",
+    "lat": 19.2423517,
+    "lon": -98.8458783,
+    "meter": {
+      "deviceId": "tlaloque-15DPR0454Z",
+      "meterNumber": "15DPR0454Z",
+      "status": "online",
+      "latestReadingM3": 81
+    },
+    "evidence": {
+      "photoUrl": "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/744685518/attachments/attTQMexAjwPc6nZyXBwB52s/",
+      "notes": "ANALOGO"
+    },
+    "raw": {
+      "lastFollowUpDate": "2026-01-29",
+      "scallInUse": "SI"
+    }
+  },
+  {
+    "schoolId": "15DTV0170S",
+    "schoolName": "TELESECUNDARIA IGNACIO ALLENDE",
+    "municipio": "CHALCO",
+    "estado": "ESTADO DE MEXICO",
+    "projectType": "leak_reduction_efficiency",
+    "projectStatus": "under_review",
+    "basinId": "CHALCO",
+    "operator": "MARTIN LIEDO",
+    "lat": 19.227573,
+    "lon": -98.91979,
+    "meter": {
+      "deviceId": "tlaloque-15DTV0170S",
+      "meterNumber": "15DTV0170S",
+      "status": "online",
+      "latestReadingM3": 41
+    },
+    "evidence": {
+      "photoUrl": "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/744685980/attachments/attyPYaqtboKNAf7JeRJM4dj/",
+      "notes": "MEDIDOR ANALOGO"
+    },
+    "raw": {
+      "lastFollowUpDate": "2026-01-29",
+      "scallInUse": "SI"
+    }
+  },
+  {
+    "schoolId": "15EJN3378M",
+    "schoolName": "PREESCOLAR RICARDO FLORES MAGON",
+    "municipio": "LA PAZ",
+    "estado": "ESTADO DE MEXICO",
+    "projectType": "desalination_treatment",
+    "projectStatus": "under_review",
+    "basinId": "LA-PAZ",
+    "operator": "MARTIN LIEDO",
+    "lat": 19.3456217,
+    "lon": -98.9428083,
+    "meter": {
+      "deviceId": "tlaloque-15EJN3378M",
+      "meterNumber": "15EJN3378M",
+      "status": "online",
+      "latestReadingM3": 23
+    },
+    "evidence": {
+      "photoUrl": "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/750450637/attachments/attry2LjyWxN9nnSriHhkgVU/",
+      "notes": "NO LE PONEN AGUA DE OTRA FUENTE AL TANQUE DEL SCALL"
+    },
+    "raw": {
+      "lastFollowUpDate": "2026-02-19",
+      "scallInUse": "SI"
+    }
+  }
+]

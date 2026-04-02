@@ -1,0 +1,146 @@
+[
+  {
+    "projectId": "BL-PROJ-001",
+    "projectName": "PRIMARIA BENITO JUAREZ",
+    "projectType": "leak_reduction_efficiency",
+    "location": {
+      "basinId": "ECATEPEC-DE-MORELOS",
+      "municipality": "ECATEPEC DE MORELOS",
+      "state": "ESTADO DE MEXICO",
+      "country": "Mexico",
+      "lat": 19.54418,
+      "lon": -99.074364
+    },
+    "operator": "MARTIN LIEDO",
+    "status": "under_review",
+    "linkedDeviceIds": [
+      "tlaloque-15DPR0594Z"
+    ],
+    "evidenceFiles": [
+      "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/748605275/attachments/attan9aYM9pyomUiUWehEwju/"
+    ],
+    "certificationReviewer": "Pending assignment",
+    "methodologyStatus": "draft",
+    "notes": "TODO FUNCIONA BIEN"
+  },
+  {
+    "projectId": "BL-PROJ-002",
+    "projectName": "SECUNDARIA OFTV NO.0194 GRAL EMILIANO ZAPATA",
+    "projectType": "desalination_treatment",
+    "location": {
+      "basinId": "TLALMANALCO",
+      "municipality": "TLALMANALCO",
+      "state": "ESTADO DE MEXICO",
+      "country": "Mexico",
+      "lat": 19.1666583,
+      "lon": -98.7820067
+    },
+    "operator": "MARTIN LIEDO",
+    "status": "under_review",
+    "linkedDeviceIds": [
+      "tlaloque-15ETV0293A"
+    ],
+    "evidenceFiles": [
+      "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/746538703/attachments/attqJHZ6258pANspHn7dHcHo/"
+    ],
+    "certificationReviewer": "Pending assignment",
+    "methodologyStatus": "draft",
+    "notes": "EL MEDIDOR NO FUNCIONA BIEN SOLO CUANDO SE CORTA A LA MITAD EL FLUJO DE AGUA EMPIEZA A FUNCIONAR"
+  },
+  {
+    "projectId": "BL-PROJ-003",
+    "projectName": "PREPARATORIA OFICIAL NO 271",
+    "projectType": "leak_reduction_efficiency",
+    "location": {
+      "basinId": "AMECAMECA",
+      "municipality": "AMECAMECA",
+      "state": "ESTADO DE MEXICO",
+      "country": "Mexico",
+      "lat": 19.083353,
+      "lon": -98.784394
+    },
+    "operator": "MARTIN LIEDO",
+    "status": "under_review",
+    "linkedDeviceIds": [
+      "tlaloque-15EBH0466T"
+    ],
+    "evidenceFiles": [
+      "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/746539034/attachments/attgHYZspjAYNcoHp89nSGLK/"
+    ],
+    "certificationReviewer": "Pending assignment",
+    "methodologyStatus": "draft",
+    "notes": "MEDIDOR ANALOGO"
+  },
+  {
+    "projectId": "BL-PROJ-004",
+    "projectName": "PRIMARIA VICENTE GUERRERO",
+    "projectType": "desalination_treatment",
+    "location": {
+      "basinId": "CHALCO",
+      "municipality": "CHALCO",
+      "state": "ESTADO DE MEXICO",
+      "country": "Mexico",
+      "lat": 19.2423517,
+      "lon": -98.8458783
+    },
+    "operator": "MARTIN LIEDO",
+    "status": "under_review",
+    "linkedDeviceIds": [
+      "tlaloque-15DPR0454Z"
+    ],
+    "evidenceFiles": [
+      "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/744685518/attachments/attTQMexAjwPc6nZyXBwB52s/"
+    ],
+    "certificationReviewer": "Pending assignment",
+    "methodologyStatus": "draft",
+    "notes": "ANALOGO"
+  },
+  {
+    "projectId": "BL-PROJ-005",
+    "projectName": "TELESECUNDARIA IGNACIO ALLENDE",
+    "projectType": "leak_reduction_efficiency",
+    "location": {
+      "basinId": "CHALCO",
+      "municipality": "CHALCO",
+      "state": "ESTADO DE MEXICO",
+      "country": "Mexico",
+      "lat": 19.227573,
+      "lon": -98.91979
+    },
+    "operator": "MARTIN LIEDO",
+    "status": "under_review",
+    "linkedDeviceIds": [
+      "tlaloque-15DTV0170S"
+    ],
+    "evidenceFiles": [
+      "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/744685980/attachments/attyPYaqtboKNAf7JeRJM4dj/"
+    ],
+    "certificationReviewer": "Pending assignment",
+    "methodologyStatus": "draft",
+    "notes": "MEDIDOR ANALOGO"
+  },
+  {
+    "projectId": "BL-PROJ-006",
+    "projectName": "PREESCOLAR RICARDO FLORES MAGON",
+    "projectType": "desalination_treatment",
+    "location": {
+      "basinId": "LA-PAZ",
+      "municipality": "LA PAZ",
+      "state": "ESTADO DE MEXICO",
+      "country": "Mexico",
+      "lat": 19.3456217,
+      "lon": -98.9428083
+    },
+    "operator": "MARTIN LIEDO",
+    "status": "under_review",
+    "linkedDeviceIds": [
+      "tlaloque-15EJN3378M"
+    ],
+    "evidenceFiles": [
+      "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/750450637/attachments/attry2LjyWxN9nnSriHhkgVU/"
+    ],
+    "certificationReviewer": "Pending assignment",
+    "methodologyStatus": "draft",
+    "notes": "NO LE PONEN AGUA DE OTRA FUENTE AL TANQUE DEL SCALL"
+  }
+]
