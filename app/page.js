@@ -12,6 +12,16 @@ const METHOD_VERSION = 'VWBA-0.9-demo';
 const SCHOOL_PROJECT_TYPE = 'captacion_agua_de_lluvia_scall';
 const SCHOOL_PROJECT_TYPE_LABEL = 'Captación de agua de lluvia (SCALL)';
 
+const steps = [
+  { id: 1, title: 'Project' },
+  { id: 2, title: 'Map + Dossier' },
+  { id: 3, title: 'Ingestion' },
+  { id: 4, title: 'Certification' },
+  { id: 5, title: 'Issuance' },
+  { id: 6, title: 'Buyer + Retirement' },
+  { id: 7, title: 'Certificate + Audit' }
+];
+
 function fmt(n) {
   return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
@@ -54,6 +64,8 @@ export default function Page() {
   const [apiDownload, setApiDownload] = useState(null);
   const [lastReport, setLastReport] = useState(null);
   const [basinError, setBasinError] = useState('');
+  const [currentStep, setCurrentStep] = useState(1);
+
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
 
   useEffect(() => {
@@ -73,7 +85,7 @@ export default function Page() {
         basinsData = await realResponse.json();
       } catch (_error) {
         setBasinError(
-          'Real HydroBASINS layer is missing. Generate public/data/hydrobasins_l6_schools.geojson using npm run extract:basins.'
+          'Real HydroBASINS layer is missing. Generate public/data/hydrobasins_l6_schools.geojson using npm run fetch:hydrobasins.'
         );
       }
 
@@ -156,16 +168,15 @@ export default function Page() {
     recordAudit({ type: 'project_created', projectId: id, projectName: created.projectName });
   }
 
-  function runAiReviewRecommendation(project) {
+  function runAiReviewRecommendation(_project) {
     const recommendation = 'VWBA.RWH.01';
-    const missing = project.evidenceFiles?.length ? [] : ['At least one evidence document'];
+    const missing = selectedProject?.evidenceFiles?.length ? [] : ['At least one evidence document'];
     const confidence = missing.length ? 0.66 : 0.91;
     return {
       recommendation,
       confidence,
       missing,
-      summary:
-        'Method suggests rainwater harvesting outcomes with volumetric compliance checks for SCALL.'
+      summary: 'Method suggests rainwater harvesting outcomes with volumetric compliance checks for SCALL.'
     };
   }
 
@@ -391,258 +402,292 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="grid">
-        <div className="card">
-          <h2>1) Project Onboarding</h2>
-          <div className="row">
-            <input
-              value={newProject.projectName}
-              placeholder="Project name"
-              onChange={(e) => setNewProject((x) => ({ ...x, projectName: e.target.value }))}
-            />
-            <select
-              value={newProject.projectType}
-              onChange={(e) => setNewProject((x) => ({ ...x, projectType: e.target.value }))}
+      <section className="stepperWrap card">
+        <div className="stepper">
+          {steps.map((step) => (
+            <button
+              key={step.id}
+              className={`stepChip ${currentStep === step.id ? 'active' : ''} ${currentStep > step.id ? 'done' : ''}`}
+              onClick={() => setCurrentStep(step.id)}
             >
-              <option value={SCHOOL_PROJECT_TYPE}>{SCHOOL_PROJECT_TYPE_LABEL}</option>
-            </select>
-          </div>
-          <div className="row">
-            <input
-              value={newProject.basinId}
-              placeholder="Basin ID"
-              onChange={(e) => setNewProject((x) => ({ ...x, basinId: e.target.value }))}
-            />
-            <input value={newProject.lat} placeholder="Lat" onChange={(e) => setNewProject((x) => ({ ...x, lat: e.target.value }))} />
-            <input value={newProject.lon} placeholder="Lon" onChange={(e) => setNewProject((x) => ({ ...x, lon: e.target.value }))} />
-            <button onClick={createProject}>Create project</button>
-          </div>
-
-          <div className="list">
-            {projects.map((p) => (
-              <div key={p.projectId} className="item">
-                <strong>{p.projectId}</strong> · {p.projectName}
-                <div>
-                  <span className={`badge ${statusBadge(p.status)}`}>{p.status}</span>{' '}
-                  <span className="badge info">{p.projectTypeLabel || SCHOOL_PROJECT_TYPE_LABEL}</span>{' '}
-                  <span className="badge info">{p.location?.basinId}</span>
-                </div>
-                <button className="secondary" onClick={() => setSelectedProjectId(p.projectId)}>
-                  Select
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card">
-          <h2>2) Basin vs School Localization</h2>
-          {basinError ? (
-            <div className="code">{basinError}</div>
-          ) : (
-            <RealMapClient
-              schools={schools}
-              basins={basins}
-              selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null}
-            />
-          )}
-          <p>
-            Basins shown: {(basins.features || []).length}. Schools mapped: {schools.filter((s) => typeof s.lat === 'number').length}.
-            Source: <span className="badge good">HydroBASINS (real only)</span>
-          </p>
-        </div>
-
-        <div className="card">
-          <h2>2b) School Technical Dossier (BL_IU_Technical)</h2>
-          {!selectedSchool ? (
-            <p>Select a project to view school technical details.</p>
-          ) : !selectedTechnical ? (
-            <p>No BL_IU_Technical dossier found for school {selectedSchool.schoolId}.</p>
-          ) : (
-            <>
-              <p>
-                <strong>{selectedSchool.schoolName}</strong> ({selectedSchool.schoolId})
-              </p>
-              <div className="row">
-                <span className="badge info">Files: {selectedTechnical.fileCount}</span>
-                <span className="badge info">Reports: {selectedTechnical.pdfCount}</span>
-                <span className="badge info">Photos: {selectedTechnical.imageCount}</span>
-                <span className="badge info">
-                  Rain {selectedTechnical.precipitation?.latestYear || 'N/A'}:{' '}
-                  {fmt(selectedTechnical.precipitation?.latestYearTotalMm || 0)} mm
-                </span>
-              </div>
-              <p>
-                Precipitation station: {selectedTechnical.precipitation?.stationLat ?? 'N/A'},{' '}
-                {selectedTechnical.precipitation?.stationLon ?? 'N/A'} · Peak cumulative day value:{' '}
-                {fmt(selectedTechnical.precipitation?.maxDailyMm || 0)} mm
-              </p>
-              <div className="list" style={{ maxHeight: 210 }}>
-                {(selectedTechnical.reportFiles || []).map((file) => (
-                  <div className="item" key={file.path}>
-                    <strong>{file.name}</strong>
-                    <div className="row" style={{ marginTop: 6 }}>
-                      <a
-                        href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Download
-                      </a>
-                    </div>
-                  </div>
-                ))}
-                {selectedTechnical.precipitation?.sourceFile ? (
-                  <div className="item">
-                    <strong>Precipitation CSV</strong>
-                    <div className="row" style={{ marginTop: 6 }}>
-                      <a
-                        href={`/api/dossier-file?path=${encodeURIComponent(selectedTechnical.precipitation.sourceFile)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Download
-                      </a>
-                    </div>
-                  </div>
-                ) : null}
-                {(selectedTechnical.photoSamples || []).map((photoPath) => (
-                  <div className="item" key={photoPath}>
-                    <strong>{photoPath.split('/').pop()}</strong>
-                    <div className="row" style={{ marginTop: 6 }}>
-                      <a
-                        href={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Download
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="card">
-          <h2>3) Meter Ingestion + Existing API Replay</h2>
-          <p>
-            Selected project: <strong>{selectedProject?.projectId || 'None'}</strong>
-            {selectedSchool ? (
-              <>
-                {' '}
-                · device <strong>{selectedSchool.meter.deviceId}</strong> · current reading{' '}
-                <strong>{fmt(selectedSchool.meter.latestReadingM3)} m³</strong>
-              </>
-            ) : null}
-          </p>
-          <div className="row">
-            <button disabled={!selectedProject || simBusy} onClick={runSimulation}>
-              {simBusy ? 'Simulating...' : 'Simulate + send to APIs'}
+              <span>{step.id}</span>
+              {step.title}
             </button>
-            <span className={`badge ${meterBadge(selectedSchool?.meter?.status || 'suspect')}`}>
-              meter {selectedSchool?.meter?.status || 'unknown'}
-            </span>
-          </div>
-          <div className="code">{JSON.stringify(apiDownload?.records?.slice(0, 8) || [], null, 2)}</div>
+          ))}
         </div>
-
-        <div className="card">
-          <h2>4) Certification Review Workspace</h2>
-          <p>
-            AI recommendation: <strong>{aiForSelected?.recommendation || 'N/A'}</strong> · confidence {fmt((aiForSelected?.confidence || 0) * 100)}%
-          </p>
-          <p>{aiForSelected?.summary}</p>
-          <p>Missing evidence: {aiForSelected?.missing?.length ? aiForSelected.missing.join(', ') : 'None'}</p>
-          <div className="row">
-            <button disabled={!selectedProject} onClick={() => saveReview('approve')}>
-              Human approve
-            </button>
-            <button className="secondary" disabled={!selectedProject} onClick={() => saveReview('request_info')}>
-              Request info
-            </button>
-            <button className="secondary" disabled={!selectedProject} onClick={() => saveReview('reject')}>
-              Reject
-            </button>
-          </div>
-          <div className="code">{JSON.stringify(selectedProject ? reviews[selectedProject.projectId] || {} : {}, null, 2)}</div>
-        </div>
-
-        <div className="card">
-          <h2>5) VWB Eligibility / WBT Issuance</h2>
-          <p>
-            Issuance is approval-gated and uses deterministic demo logic: <code>eligibleVolume = latestMeter * 0.85</code>;
-            <code>WBT quantity = floor(eligibleVolume)</code>.
-          </p>
-          <div className="row">
-            <button disabled={!selectedProject} onClick={issueWbt}>
-              Issue WBT from selected project
-            </button>
-          </div>
-          <div className="list">
-            {issuances.length === 0 ? (
-              <div className="item">No issuance batches yet.</div>
-            ) : (
-              issuances.map((x) => (
-                <div className="item" key={x.issuanceId}>
-                  <strong>{x.issuanceId}</strong> · {x.projectId} · {fmt(x.quantity)} WBT · reviewer {x.reviewer}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="card">
-          <h2>6) Permissioned Buyer + Retirement</h2>
-          <div className="row">
-            <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
-              {BUYERS.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name} ({b.approved ? 'approved' : 'unapproved'})
-                </option>
-              ))}
-            </select>
-            <input value={retireQty} onChange={(e) => setRetireQty(e.target.value)} placeholder="Quantity" />
-          </div>
-          <textarea value={retirePurpose} rows={3} onChange={(e) => setRetirePurpose(e.target.value)} />
-          <div className="row">
-            <button onClick={retireWbt}>Retire WBT</button>
-            <span className="badge info">before: {fmt(availableBalance)} WBT available</span>
-          </div>
-          <div className="list">
-            {retirements.length === 0 ? (
-              <div className="item">No retirement events yet.</div>
-            ) : (
-              retirements.map((r) => (
-                <div className="item" key={r.retirementId}>
-                  <strong>{r.retirementId}</strong> · {r.buyer} · {fmt(r.quantity)} WBT retired
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="card">
-          <h2>7) Certificate + Report Output</h2>
-          <p>Generated immediately at retirement and persisted via <code>/api/reports</code>.</p>
-          <div className="code">{JSON.stringify(lastReport || { message: 'No report generated yet.' }, null, 2)}</div>
-        </div>
-
-        <div className="card">
-          <h2>Audit Timeline</h2>
-          <div className="timeline">
-            {timeline.map((t, idx) => (
-              <p key={`${t.at}-${idx}`}>
-                <strong>{new Date(t.at).toLocaleTimeString()}</strong> · {t.text}
-              </p>
-            ))}
-          </div>
-          <p>
-            Download endpoint: <code>/api/download</code> includes sensor records, demo events, and generated reports for demo traceability.
-          </p>
+        <div className="row">
+          <button className="secondary" disabled={currentStep === 1} onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}>
+            Previous
+          </button>
+          <button disabled={currentStep === steps.length} onClick={() => setCurrentStep((s) => Math.min(steps.length, s + 1))}>
+            Next
+          </button>
         </div>
       </section>
+
+      {currentStep === 1 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>1) Project Onboarding</h2>
+            <p className="subtitle">All schools use project type: {SCHOOL_PROJECT_TYPE_LABEL}.</p>
+            <div className="row">
+              <input
+                value={newProject.projectName}
+                placeholder="Project name"
+                onChange={(e) => setNewProject((x) => ({ ...x, projectName: e.target.value }))}
+              />
+              <select value={newProject.projectType} onChange={(e) => setNewProject((x) => ({ ...x, projectType: e.target.value }))}>
+                <option value={SCHOOL_PROJECT_TYPE}>{SCHOOL_PROJECT_TYPE_LABEL}</option>
+              </select>
+            </div>
+            <div className="row">
+              <input
+                value={newProject.basinId}
+                placeholder="Basin ID"
+                onChange={(e) => setNewProject((x) => ({ ...x, basinId: e.target.value }))}
+              />
+              <input value={newProject.lat} placeholder="Lat" onChange={(e) => setNewProject((x) => ({ ...x, lat: e.target.value }))} />
+              <input value={newProject.lon} placeholder="Lon" onChange={(e) => setNewProject((x) => ({ ...x, lon: e.target.value }))} />
+              <button onClick={createProject}>Create project</button>
+            </div>
+
+            <div className="list">
+              {projects.map((p) => (
+                <div key={p.projectId} className="item">
+                  <strong>{p.projectId}</strong> · {p.projectName}
+                  <div>
+                    <span className={`badge ${statusBadge(p.status)}`}>{p.status}</span>{' '}
+                    <span className="badge info">{p.projectTypeLabel || SCHOOL_PROJECT_TYPE_LABEL}</span>{' '}
+                    <span className="badge info">{p.location?.basinId}</span>
+                  </div>
+                  <button className="secondary" onClick={() => setSelectedProjectId(p.projectId)}>
+                    Select
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {currentStep === 2 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>2) Basin vs School Localization</h2>
+            {basinError ? (
+              <div className="code">{basinError}</div>
+            ) : (
+              <RealMapClient schools={schools} basins={basins} selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null} />
+            )}
+            <p>
+              Basins shown: {(basins.features || []).length}. Schools mapped: {schools.filter((s) => typeof s.lat === 'number').length}. Source:{' '}
+              <span className="badge good">HydroBASINS (real only)</span>
+            </p>
+          </div>
+
+          <div className="card">
+            <h2>2b) School Technical Dossier (BL_IU_Technical)</h2>
+            {!selectedSchool ? (
+              <p>Select a project to view school technical details.</p>
+            ) : !selectedTechnical ? (
+              <p>No BL_IU_Technical dossier found for school {selectedSchool.schoolId}.</p>
+            ) : (
+              <>
+                <p>
+                  <strong>{selectedSchool.schoolName}</strong> ({selectedSchool.schoolId})
+                </p>
+                <div className="row">
+                  <span className="badge info">Files: {selectedTechnical.fileCount}</span>
+                  <span className="badge info">Reports: {selectedTechnical.pdfCount}</span>
+                  <span className="badge info">Photos: {selectedTechnical.imageCount}</span>
+                  <span className="badge info">
+                    Rain {selectedTechnical.precipitation?.latestYear || 'N/A'}: {fmt(selectedTechnical.precipitation?.latestYearTotalMm || 0)} mm
+                  </span>
+                </div>
+                <p>
+                  Precipitation station: {selectedTechnical.precipitation?.stationLat ?? 'N/A'}, {selectedTechnical.precipitation?.stationLon ?? 'N/A'} ·
+                  Peak cumulative day value: {fmt(selectedTechnical.precipitation?.maxDailyMm || 0)} mm
+                </p>
+                <div className="list" style={{ maxHeight: 210 }}>
+                  {(selectedTechnical.reportFiles || []).map((file) => (
+                    <div className="item" key={file.path}>
+                      <strong>{file.name}</strong>
+                      <div className="row" style={{ marginTop: 6 }}>
+                        <a href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`} target="_blank" rel="noreferrer">
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                  {selectedTechnical.precipitation?.sourceFile ? (
+                    <div className="item">
+                      <strong>Precipitation CSV</strong>
+                      <div className="row" style={{ marginTop: 6 }}>
+                        <a
+                          href={`/api/dossier-file?path=${encodeURIComponent(selectedTechnical.precipitation.sourceFile)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  ) : null}
+                  {(selectedTechnical.photoSamples || []).map((photoPath) => (
+                    <div className="item" key={photoPath}>
+                      <strong>{photoPath.split('/').pop()}</strong>
+                      <div className="row" style={{ marginTop: 6 }}>
+                        <a href={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`} target="_blank" rel="noreferrer">
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      ) : null}
+
+      {currentStep === 3 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>3) Meter Ingestion + Existing API Replay</h2>
+            <p>
+              Selected project: <strong>{selectedProject?.projectId || 'None'}</strong>
+              {selectedSchool ? (
+                <>
+                  {' '}
+                  · device <strong>{selectedSchool.meter.deviceId}</strong> · current reading <strong>{fmt(selectedSchool.meter.latestReadingM3)} m³</strong>
+                </>
+              ) : null}
+            </p>
+            <div className="row">
+              <button disabled={!selectedProject || simBusy} onClick={runSimulation}>
+                {simBusy ? 'Simulating...' : 'Simulate + send to APIs'}
+              </button>
+              <span className={`badge ${meterBadge(selectedSchool?.meter?.status || 'suspect')}`}>
+                meter {selectedSchool?.meter?.status || 'unknown'}
+              </span>
+            </div>
+            <div className="code">{JSON.stringify(apiDownload?.records?.slice(0, 8) || [], null, 2)}</div>
+          </div>
+        </section>
+      ) : null}
+
+      {currentStep === 4 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>4) Certification Review Workspace</h2>
+            <p>
+              AI recommendation: <strong>{aiForSelected?.recommendation || 'N/A'}</strong> · confidence {fmt((aiForSelected?.confidence || 0) * 100)}%
+            </p>
+            <p>{aiForSelected?.summary}</p>
+            <p>Missing evidence: {aiForSelected?.missing?.length ? aiForSelected.missing.join(', ') : 'None'}</p>
+            <div className="row">
+              <button disabled={!selectedProject} onClick={() => saveReview('approve')}>
+                Human approve
+              </button>
+              <button className="secondary" disabled={!selectedProject} onClick={() => saveReview('request_info')}>
+                Request info
+              </button>
+              <button className="secondary" disabled={!selectedProject} onClick={() => saveReview('reject')}>
+                Reject
+              </button>
+            </div>
+            <div className="code">{JSON.stringify(selectedProject ? reviews[selectedProject.projectId] || {} : {}, null, 2)}</div>
+          </div>
+        </section>
+      ) : null}
+
+      {currentStep === 5 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>5) VWB Eligibility / WBT Issuance</h2>
+            <p>
+              Issuance is approval-gated and uses deterministic demo logic: <code>eligibleVolume = latestMeter * 0.85</code>;
+              <code>WBT quantity = floor(eligibleVolume)</code>.
+            </p>
+            <div className="row">
+              <button disabled={!selectedProject} onClick={issueWbt}>
+                Issue WBT from selected project
+              </button>
+            </div>
+            <div className="list">
+              {issuances.length === 0 ? (
+                <div className="item">No issuance batches yet.</div>
+              ) : (
+                issuances.map((x) => (
+                  <div className="item" key={x.issuanceId}>
+                    <strong>{x.issuanceId}</strong> · {x.projectId} · {fmt(x.quantity)} WBT · reviewer {x.reviewer}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {currentStep === 6 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>6) Permissioned Buyer + Retirement</h2>
+            <div className="row">
+              <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
+                {BUYERS.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} ({b.approved ? 'approved' : 'unapproved'})
+                  </option>
+                ))}
+              </select>
+              <input value={retireQty} onChange={(e) => setRetireQty(e.target.value)} placeholder="Quantity" />
+            </div>
+            <textarea value={retirePurpose} rows={3} onChange={(e) => setRetirePurpose(e.target.value)} />
+            <div className="row">
+              <button onClick={retireWbt}>Retire WBT</button>
+              <span className="badge info">before: {fmt(availableBalance)} WBT available</span>
+            </div>
+            <div className="list">
+              {retirements.length === 0 ? (
+                <div className="item">No retirement events yet.</div>
+              ) : (
+                retirements.map((r) => (
+                  <div className="item" key={r.retirementId}>
+                    <strong>{r.retirementId}</strong> · {r.buyer} · {fmt(r.quantity)} WBT retired
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {currentStep === 7 ? (
+        <section className="wizardScreen">
+          <div className="card">
+            <h2>7) Certificate + Report Output</h2>
+            <p>
+              Generated immediately at retirement and persisted via <code>/api/reports</code>.
+            </p>
+            <div className="code">{JSON.stringify(lastReport || { message: 'No report generated yet.' }, null, 2)}</div>
+          </div>
+
+          <div className="card">
+            <h2>Audit Timeline</h2>
+            <div className="timeline">
+              {timeline.map((t, idx) => (
+                <p key={`${t.at}-${idx}`}>
+                  <strong>{new Date(t.at).toLocaleTimeString()}</strong> · {t.text}
+                </p>
+              ))}
+            </div>
+            <p>
+              Download endpoint: <code>/api/download</code> includes sensor records, demo events, and generated reports for demo traceability.
+            </p>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
