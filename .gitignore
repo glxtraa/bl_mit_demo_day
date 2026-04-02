@@ -22,3 +22,7 @@ pnpm-debug.log*
 # local runtime/tmp data
 *.tmp
 /tmp/
+
+# hydrobasins raw downloads/cache
+public/data/hydrobasins_raw/
+public/data/hybas_na_lev06_v1c.geojson

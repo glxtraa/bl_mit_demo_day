@@ -51,7 +51,8 @@ export default function Page() {
   const [simBusy, setSimBusy] = useState(false);
   const [apiDownload, setApiDownload] = useState(null);
   const [lastReport, setLastReport] = useState(null);
-  const [usingRealBasins, setUsingRealBasins] = useState(false);
+  const [basinError, setBasinError] = useState('');
+  const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
 
   useEffect(() => {
     async function load() {
@@ -62,32 +63,28 @@ export default function Page() {
       ]);
 
       let basinsData = { type: 'FeatureCollection', features: [] };
-      let real = false;
       try {
         const realResponse = await fetch('/data/hydrobasins_l6_schools.geojson');
-        if (realResponse.ok) {
-          basinsData = await realResponse.json();
-          real = true;
-        } else {
-          basinsData = await fetch('/data/basins.geojson').then((r) => r.json());
+        if (!realResponse.ok) {
+          throw new Error('Missing /public/data/hydrobasins_l6_schools.geojson');
         }
+        basinsData = await realResponse.json();
       } catch (_error) {
-        basinsData = await fetch('/data/basins.geojson').then((r) => r.json());
+        setBasinError(
+          'Real HydroBASINS layer is missing. Generate public/data/hydrobasins_l6_schools.geojson using npm run extract:basins.'
+        );
       }
 
       setSchools(schoolsData);
       setProjects(projectsData);
       setBasins(basinsData);
-      setUsingRealBasins(real);
       setSelectedProjectId(projectsData[0]?.projectId || '');
       setApiDownload(downloadData);
       setTimeline((t) => [
         ...t,
         {
           at: new Date().toISOString(),
-          text: `Loaded ${projectsData.length} seeded projects and ${basinsData.features.length} ${
-            real ? 'HydroBASINS' : 'fallback'
-          } basins.`
+          text: `Loaded ${projectsData.length} seeded projects and ${basinsData.features.length} HydroBASINS polygons.`
         }
       ]);
     }
@@ -360,6 +357,12 @@ export default function Page() {
             End-to-end path: project onboarding, meter ingestion, certification approval, VWB issuance, buyer retirement,
             and report generation. Includes schools dataset, simulated SSCAP measurements, and basin vs school localization.
           </p>
+          <p className="subtitle">
+            Demo link:{' '}
+            <a href={demoUrl} target="_blank" rel="noreferrer">
+              {demoUrl}
+            </a>
+          </p>
         </div>
       </section>
 
@@ -433,14 +436,18 @@ export default function Page() {
 
         <div className="card">
           <h2>2) Basin vs School Localization</h2>
-          <RealMapClient
-            schools={schools}
-            basins={basins}
-            selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null}
-          />
+          {basinError ? (
+            <div className="code">{basinError}</div>
+          ) : (
+            <RealMapClient
+              schools={schools}
+              basins={basins}
+              selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null}
+            />
+          )}
           <p>
             Basins shown: {(basins.features || []).length}. Schools mapped: {schools.filter((s) => typeof s.lat === 'number').length}.
-            Source: <span className={`badge ${usingRealBasins ? 'good' : 'warn'}`}>{usingRealBasins ? 'HydroBASINS (real)' : 'Fallback demo polygons'}</span>
+            Source: <span className="badge good">HydroBASINS (real only)</span>
           </p>
         </div>
 

@@ -9,6 +9,7 @@ Vercel-ready end-to-end demo for MIT Demo Day covering:
 - Certificate/report generation
 - Basin vs school localization map using provided school dataset
   - Uses real OpenStreetMap tiles (Leaflet)
+  - Uses real HydroBASINS polygons only (no fallback)
 
 ## 1) Prepare data assets
 
@@ -26,30 +27,26 @@ from `Background/Schools/school-data.csv`.
 
 ## Real HydroBASINS (recommended)
 
-The app will automatically use real basins from:
+The app requires real basins from:
 
 - `public/data/hydrobasins_l6_schools.geojson`
 
-If that file is missing, it falls back to demo polygons in `public/data/basins.geojson`.
+If this file is missing, the UI shows a hard error and does not use demo polygons.
 
-### Generate real matched basins
-
-1. Download HydroBASINS Level 6 for North America:
-   - `https://data.hydrosheds.org/file/hydrobasins/standard/hybas_na_lev06_v1c.zip`
-2. Convert the shapefile to GeoJSON (example with GDAL):
+### Generate real matched basins (no GDAL required)
 
 ```bash
-ogr2ogr -f GeoJSON public/data/hybas_na_lev06_v1c.geojson hybas_na_lev06_v1c.shp
+npm run prepare:data
+npm run fetch:hydrobasins
 ```
 
-3. Extract only polygons containing school points:
-
-```bash
-npm run extract:basins -- \
-  --basins public/data/hybas_na_lev06_v1c.geojson \
-  --schools public/data/schools.cleaned.json \
-  --output public/data/hydrobasins_l6_schools.geojson
-```
+What this does:
+- Downloads official HydroBASINS L6 zip from HydroSHEDS
+- Parses shapefiles with `shpjs` (pure Node)
+- Matches school points to real basins
+- Writes:
+  - `public/data/hybas_na_lev06_v1c.geojson` (raw parsed basins)
+  - `public/data/hydrobasins_l6_schools.geojson` (matched basin layer used by UI)
 
 ## 2) Run locally
 
@@ -84,7 +81,8 @@ When you click **Simulate + send to APIs**, the app sends data to:
 1. Push this repo to GitHub.
 2. Import it into Vercel.
 3. Add env vars from `.env.example` in Vercel settings.
-4. Deploy.
+4. Optional: add `NEXT_PUBLIC_DEMO_URL` to show your live demo URL in the header.
+5. Deploy.
 
 ## Notes
 

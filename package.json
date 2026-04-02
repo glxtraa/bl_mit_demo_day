@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare:data": "node scripts/build-school-assets.mjs",
+    "fetch:hydrobasins": "node scripts/fetch-hydrobasins.mjs",
     "extract:basins": "node scripts/extract-hydrobasins.mjs"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
     "next": "14.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "shpjs": "^6.2.0"
   }
 }
