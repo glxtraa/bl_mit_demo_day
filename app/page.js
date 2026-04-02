@@ -80,11 +80,150 @@ function reviewMeta(decision) {
 }
 
 function StatusPill({ tone, icon, label }) {
+  const common = {
+    className: 'statusSvg',
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': 'true'
+  };
+
+  function IconGlyph() {
+    if (icon === 'check') {
+      return (
+        <svg {...common}>
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      );
+    }
+    if (icon === 'x') {
+      return (
+        <svg {...common}>
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      );
+    }
+    if (icon === 'clock') {
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <polyline points="12 7 12 12 15 14" />
+        </svg>
+      );
+    }
+    if (icon === 'warn') {
+      return (
+        <svg {...common}>
+          <path d="M12 3L2.5 20.5h19L12 3z" />
+          <line x1="12" y1="9" x2="12" y2="14" />
+          <circle cx="12" cy="17.2" r="0.8" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    }
+    if (icon === 'pause') {
+      return (
+        <svg {...common}>
+          <rect x="6.5" y="5.5" width="4" height="13" />
+          <rect x="13.5" y="5.5" width="4" height="13" />
+        </svg>
+      );
+    }
+    if (icon === 'doc') {
+      return (
+        <svg {...common}>
+          <path d="M7 3.5h7l4 4V20.5H7z" />
+          <polyline points="14 3.5 14 8 18 8" />
+          <line x1="9.5" y1="12" x2="15.5" y2="12" />
+          <line x1="9.5" y1="15" x2="15.5" y2="15" />
+        </svg>
+      );
+    }
+    if (icon === 'wifi') {
+      return (
+        <svg {...common}>
+          <path d="M4 9.5a12 12 0 0 1 16 0" />
+          <path d="M7.5 13a7.5 7.5 0 0 1 9 0" />
+          <path d="M11 16.5a3 3 0 0 1 2 0" />
+          <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    }
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+      </svg>
+    );
+  }
+
   return (
     <span className={`statusPill ${tone}`}>
-      <span className={`statusIcon ${icon}`} aria-hidden="true" />
+      <span className="statusIconWrap">
+        <IconGlyph />
+      </span>
       {label}
     </span>
+  );
+}
+
+function KpiIcon({ icon }) {
+  const common = {
+    className: 'kpiSvg',
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': 'true'
+  };
+  if (icon === 'projects') {
+    return (
+      <svg {...common}>
+        <rect x="3.5" y="4.5" width="7" height="7" />
+        <rect x="13.5" y="4.5" width="7" height="7" />
+        <rect x="3.5" y="14.5" width="7" height="7" />
+        <rect x="13.5" y="14.5" width="7" height="7" />
+      </svg>
+    );
+  }
+  if (icon === 'issued') {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7v10" />
+        <path d="M8.5 10.5l3.5-3.5 3.5 3.5" />
+      </svg>
+    );
+  }
+  if (icon === 'retired') {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7v10" />
+        <path d="M8.5 13.5l3.5 3.5 3.5-3.5" />
+      </svg>
+    );
+  }
+  if (icon === 'balance') {
+    return (
+      <svg {...common}>
+        <path d="M4 12h16" />
+        <path d="M12 4v16" />
+        <circle cx="12" cy="12" r="8.5" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M4 18.5h16" />
+      <path d="M7 16V9.5" />
+      <path d="M12 16V6.5" />
+      <path d="M17 16V12.5" />
+    </svg>
   );
 }
 
@@ -249,6 +388,7 @@ export default function Page() {
     () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
     [basinQuarterAggregates, selectedBasinId, selectedQuarter]
   );
+  const selectedAggregateApproval = approvedIssuanceBasis[`${selectedBasinId}::${selectedQuarter}`] || null;
 
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
   const totalRetired = useMemo(() => retirements.reduce((sum, x) => sum + x.quantity, 0), [retirements]);
@@ -573,23 +713,38 @@ export default function Page() {
       </section>
 
       <section className="kpis">
-        <div className="kpi">
+        <div className="kpi projects">
+          <span className="kpiIconWrap">
+            <KpiIcon icon="projects" />
+          </span>
           <div className="label">Projects</div>
           <div className="value">{projects.length}</div>
         </div>
-        <div className="kpi">
+        <div className="kpi issued">
+          <span className="kpiIconWrap">
+            <KpiIcon icon="issued" />
+          </span>
           <div className="label">Total Issued WBT</div>
           <div className="value">{fmt(totalIssued)}</div>
         </div>
-        <div className="kpi">
+        <div className="kpi retired">
+          <span className="kpiIconWrap">
+            <KpiIcon icon="retired" />
+          </span>
           <div className="label">Total Retired WBT</div>
           <div className="value">{fmt(totalRetired)}</div>
         </div>
-        <div className="kpi">
+        <div className="kpi balance">
+          <span className="kpiIconWrap">
+            <KpiIcon icon="balance" />
+          </span>
           <div className="label">Available Balance</div>
           <div className="value">{fmt(availableBalance)}</div>
         </div>
-        <div className="kpi">
+        <div className="kpi records">
+          <span className="kpiIconWrap">
+            <KpiIcon icon="records" />
+          </span>
           <div className="label">Meter Records Ingested</div>
           <div className="value">{apiDownload?.records?.length || 0}</div>
         </div>
@@ -615,6 +770,23 @@ export default function Page() {
           <button disabled={currentStep === steps.length} onClick={() => setCurrentStep((s) => Math.min(steps.length, s + 1))}>
             Next
           </button>
+        </div>
+      </section>
+      <section className="card statusBoard">
+        <h3>Live Status Cues</h3>
+        <div className="row">
+          <StatusPill {...statusMeta(selectedProject?.status || 'draft')} />
+          <StatusPill {...meterMeta(selectedSchool?.meter?.status || 'unknown')} />
+          <StatusPill {...reviewMeta(reviews[selectedProject?.projectId || '']?.decision)} />
+          <StatusPill
+            tone={selectedAggregateApproval ? 'good' : 'warn'}
+            icon={selectedAggregateApproval ? 'check' : 'clock'}
+            label={
+              selectedAggregateApproval
+                ? `Aggregate Approved (${selectedBasinId || 'N/A'} ${selectedQuarter})`
+                : `Aggregate Pending (${selectedBasinId || 'N/A'} ${selectedQuarter})`
+            }
+          />
         </div>
       </section>
 
@@ -646,7 +818,7 @@ export default function Page() {
 
             <div className="list">
               {projects.map((p) => (
-                <div key={p.projectId} className="item">
+                <div key={p.projectId} className={`item stateItem ${statusMeta(p.status).tone}`}>
                   <strong>{p.projectId}</strong> · {p.projectName}
                   <div>
                     <StatusPill {...statusMeta(p.status)} />{' '}
@@ -900,7 +1072,7 @@ export default function Page() {
                 <div className="item">No issuance batches yet.</div>
               ) : (
                 issuances.map((x) => (
-                  <div className="item" key={x.issuanceId}>
+                  <div className="item stateItem good" key={x.issuanceId}>
                     <strong>{x.issuanceId}</strong> · {x.projectId} · basin {x.basinId} · {x.quarter} · {fmt(x.quantity)} WBT · reviewer {x.reviewer}
                   </div>
                 ))
@@ -934,7 +1106,7 @@ export default function Page() {
                 <div className="item">No retirement events yet.</div>
               ) : (
                 retirements.map((r) => (
-                  <div className="item" key={r.retirementId}>
+                  <div className="item stateItem info" key={r.retirementId}>
                     <strong>{r.retirementId}</strong> · {r.buyer} · {fmt(r.quantity)} WBT retired
                   </div>
                 ))

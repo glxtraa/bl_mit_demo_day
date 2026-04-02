@@ -126,6 +126,10 @@ a {
   background: #e6f8ef;
 }
 
+.stepChip.done span {
+  background: #ccefdc;
+}
+
 .card h2,
 .card h3 {
   margin: 0 0 8px;
@@ -152,6 +156,8 @@ a {
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px;
+  position: relative;
+  overflow: hidden;
 }
 
 .kpi .label {
@@ -163,6 +169,54 @@ a {
   font-size: 19px;
   font-weight: 700;
   margin-top: 4px;
+}
+
+.kpiIconWrap {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.kpiSvg {
+  width: 15px;
+  height: 15px;
+}
+
+.kpi.projects {
+  border-color: #c9dff0;
+  background: linear-gradient(145deg, #eff8ff 0%, #f9fcff 100%);
+  color: #1b5573;
+}
+
+.kpi.issued {
+  border-color: #bfe8d6;
+  background: linear-gradient(145deg, #e6f8ef 0%, #f8fcfa 100%);
+  color: #0d6b4e;
+}
+
+.kpi.retired {
+  border-color: #f3d7a2;
+  background: linear-gradient(145deg, #fff2dc 0%, #fffaf0 100%);
+  color: #8a5a07;
+}
+
+.kpi.balance {
+  border-color: #cad2f2;
+  background: linear-gradient(145deg, #edf1ff 0%, #fafbff 100%);
+  color: #2f4f8f;
+}
+
+.kpi.records {
+  border-color: #d5d9df;
+  background: linear-gradient(145deg, #f2f4f7 0%, #fafbfd 100%);
+  color: #445466;
 }
 
 .row {
@@ -224,6 +278,27 @@ button:disabled {
   border-bottom: 1px solid #edf3f8;
 }
 
+.stateItem {
+  border-left: 4px solid transparent;
+  background: linear-gradient(90deg, #f8fbfe 0%, #ffffff 22%);
+}
+
+.stateItem.good {
+  border-left-color: var(--good);
+}
+
+.stateItem.warn {
+  border-left-color: var(--warn);
+}
+
+.stateItem.bad {
+  border-left-color: var(--bad);
+}
+
+.stateItem.info {
+  border-left-color: var(--brand);
+}
+
 .item:last-child {
   border-bottom: none;
 }
@@ -267,8 +342,9 @@ button:disabled {
   font-size: 12px;
   font-weight: 700;
   border-radius: 999px;
-  padding: 4px 10px;
+  padding: 5px 10px 5px 7px;
   border: 1px solid transparent;
+  box-shadow: 0 1px 0 rgba(9, 35, 52, 0.08);
 }
 
 .statusPill.good {
@@ -295,139 +371,23 @@ button:disabled {
   border-color: #bfdded;
 }
 
-.statusIcon {
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  position: relative;
+.statusIconWrap {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.statusIcon.dot::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  position: absolute;
-  inset: 3px;
+.statusSvg {
+  width: 13px;
+  height: 13px;
 }
 
-.statusIcon.check::before {
-  content: "";
-  width: 8px;
-  height: 4px;
-  border-left: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(-45deg);
-  position: absolute;
-  left: 2px;
-  top: 3px;
-}
-
-.statusIcon.x::before,
-.statusIcon.x::after {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 1px;
-  width: 2px;
-  height: 12px;
-  background: currentColor;
-}
-
-.statusIcon.x::before {
-  transform: rotate(45deg);
-}
-
-.statusIcon.x::after {
-  transform: rotate(-45deg);
-}
-
-.statusIcon.clock::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  position: absolute;
-  left: 1px;
-  top: 1px;
-}
-
-.statusIcon.clock::after {
-  content: "";
-  width: 2px;
-  height: 4px;
-  background: currentColor;
-  position: absolute;
-  left: 6px;
-  top: 4px;
-  box-shadow: -2px 2px 0 0 currentColor;
-}
-
-.statusIcon.warn::before {
-  content: "";
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 12px solid currentColor;
-  position: absolute;
-  left: 0;
-  top: 1px;
-}
-
-.statusIcon.pause::before,
-.statusIcon.pause::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  width: 3px;
-  height: 10px;
-  background: currentColor;
-}
-
-.statusIcon.pause::before {
-  left: 3px;
-}
-
-.statusIcon.pause::after {
-  right: 3px;
-}
-
-.statusIcon.doc::before {
-  content: "";
-  width: 10px;
-  height: 12px;
-  border: 2px solid currentColor;
-  border-radius: 2px;
-  position: absolute;
-  left: 2px;
-  top: 1px;
-}
-
-.statusIcon.wifi::before,
-.statusIcon.wifi::after {
-  content: "";
-  position: absolute;
-  left: 1px;
-  right: 1px;
-  border: 2px solid currentColor;
-  border-top: none;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-.statusIcon.wifi::before {
-  top: 2px;
-  height: 6px;
-}
-
-.statusIcon.wifi::after {
-  top: 6px;
-  height: 3px;
+.statusBoard {
+  margin-bottom: 12px;
 }
 
 .mapLeaflet {
