@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare:data": "node scripts/build-school-assets.mjs",
+    "fetch:rain": "node scripts/fetch-rain-seasonality.mjs",
     "fetch:hydrobasins": "node scripts/fetch-hydrobasins.mjs",
     "extract:basins": "node scripts/extract-hydrobasins.mjs"
   },

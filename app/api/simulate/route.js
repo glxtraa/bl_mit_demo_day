@@ -20,6 +20,7 @@ export async function POST(request) {
       currentReadingM3 = 0,
       points = 3,
       stepM3 = 1.5,
+      seasonal = null,
       sendToExistingApi = false,
       includeCaptado = true,
       includeNivel = true
@@ -129,6 +130,7 @@ export async function POST(request) {
       schoolId,
       deviceId,
       points,
+      seasonal,
       at: isoNow(),
       sentToExistingApi: Boolean(sendToExistingApi && process.env.SSCAP_API_BASE_URL)
     });
@@ -137,6 +139,7 @@ export async function POST(request) {
       ok: true,
       event,
       measurements,
+      seasonal,
       localIngestion: {
         attempted: localResults.length,
         succeeded: localResults.filter((r) => r.status === 'fulfilled').length

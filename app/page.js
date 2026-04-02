@@ -22,8 +22,25 @@ const steps = [
   { id: 7, title: 'Certificate + Audit' }
 ];
 
+const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'];
+
 function fmt(n) {
   return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+function monthKeyFromDate(dateLike) {
+  const date = dateLike ? new Date(dateLike) : new Date();
+  const month = Number.isNaN(date.getTime()) ? new Date().getMonth() + 1 : date.getMonth() + 1;
+  return String(month).padStart(2, '0');
+}
+
+function quarterFromDate(dateLike) {
+  const date = dateLike ? new Date(dateLike) : new Date();
+  const month = Number.isNaN(date.getTime()) ? new Date().getMonth() + 1 : date.getMonth() + 1;
+  if (month <= 3) return 'Q1';
+  if (month <= 6) return 'Q2';
+  if (month <= 9) return 'Q3';
+  return 'Q4';
 }
 
 function statusBadge(status) {
@@ -94,6 +111,11 @@ export default function Page() {
   });
   const [simBusy, setSimBusy] = useState(false);
   const [apiDownload, setApiDownload] = useState(null);
+  const [rainSeasonality, setRainSeasonality] = useState({ source: null, schools: {} });
+  const [rainLoadError, setRainLoadError] = useState('');
+  const [selectedQuarter, setSelectedQuarter] = useState(quarterFromDate());
+  const [selectedBasinId, setSelectedBasinId] = useState('');
+  const [approvedIssuanceBasis, setApprovedIssuanceBasis] = useState({});
   const [lastReport, setLastReport] = useState(null);
   const [basinError, setBasinError] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
@@ -102,10 +124,11 @@ export default function Page() {
 
   useEffect(() => {
     async function load() {
-      const [schoolsData, projectsData, downloadData] = await Promise.all([
+      const [schoolsData, projectsData, downloadData, rainResponse] = await Promise.all([
         fetch('/data/schools.cleaned.json').then((r) => r.json()),
         fetch('/data/projects.seed.json').then((r) => r.json()),
-        fetch('/api/download').then((r) => r.json())
+        fetch('/api/download').then((r) => r.json()),
+        fetch('/data/rain_seasonality.json').catch(() => null)
       ]);
 
       let basinsData = { type: 'FeatureCollection', features: [] };
@@ -125,7 +148,13 @@ export default function Page() {
       setProjects(projectsData);
       setBasins(basinsData);
       setSelectedProjectId(projectsData[0]?.projectId || '');
+      setSelectedBasinId(projectsData[0]?.location?.basinId || schoolsData[0]?.basinId || '');
       setApiDownload(downloadData);
+      if (rainResponse?.ok) {
+        setRainSeasonality(await rainResponse.json());
+      } else {
+        setRainLoadError('Missing /public/data/rain_seasonality.json. Run npm run fetch:rain.');
+      }
       setTimeline((t) => [
         ...t,
         {
@@ -148,6 +177,78 @@ export default function Page() {
     const device = selectedProject.linkedDeviceIds?.[0];
     return schools.find((s) => s.meter?.deviceId === device) || null;
   }, [selectedProject, schools]);
+
+  useEffect(() => {
+    if (!selectedProject) return;
+    const nextBasin = selectedProject.location?.basinId || selectedSchool?.basinId || '';
+    if (nextBasin) {
+      setSelectedBasinId((prev) => prev || nextBasin);
+    }
+  }, [selectedProject, selectedSchool]);
+
+  const selectedRainProfile = useMemo(
+    () => (selectedSchool ? rainSeasonality?.schools?.[selectedSchool.schoolId] || null : null),
+    [rainSeasonality, selectedSchool]
+  );
+
+  const basinQuarterAggregates = useMemo(() => {
+    const byKey = new Map();
+    const records = apiDownload?.records || [];
+
+    for (const record of records) {
+      if (record?.type !== 'utilizado') continue;
+      const deviceId = record?.data?.tlaloque_id;
+      const pulses = Number(record?.data?.pulses);
+      if (!deviceId || !Number.isFinite(pulses)) continue;
+
+      const school = schools.find((s) => s.meter?.deviceId === deviceId);
+      const basinId = school?.basinId || projects.find((p) => (p.linkedDeviceIds || []).includes(deviceId))?.location?.basinId || 'UNIDENTIFIED';
+      const sourceDate = record?.data?.used_at || record?.createdAt;
+      const quarter = quarterFromDate(sourceDate);
+      const key = `${basinId}::${quarter}`;
+      const usedM3 = Math.max(0, pulses / 100);
+
+      if (!byKey.has(key)) {
+        byKey.set(key, {
+          key,
+          basinId,
+          quarter,
+          usedM3: 0,
+          eligibleM3: 0,
+          recordCount: 0,
+          schoolIds: new Set(),
+          deviceIds: new Set()
+        });
+      }
+      const agg = byKey.get(key);
+      agg.usedM3 += usedM3;
+      agg.recordCount += 1;
+      if (school?.schoolId) agg.schoolIds.add(school.schoolId);
+      agg.deviceIds.add(deviceId);
+    }
+
+    return [...byKey.values()]
+      .map((agg) => ({
+        ...agg,
+        usedM3: Number(agg.usedM3.toFixed(2)),
+        eligibleM3: Number((agg.usedM3 * 0.85).toFixed(2)),
+        schoolIds: [...agg.schoolIds],
+        deviceIds: [...agg.deviceIds]
+      }))
+      .sort((a, b) => a.basinId.localeCompare(b.basinId) || a.quarter.localeCompare(b.quarter));
+  }, [apiDownload, projects, schools]);
+
+  const basinOptions = useMemo(() => {
+    const values = new Set();
+    basinQuarterAggregates.forEach((x) => values.add(x.basinId));
+    schools.forEach((s) => values.add(s.basinId));
+    return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b));
+  }, [basinQuarterAggregates, schools]);
+
+  const selectedAggregate = useMemo(
+    () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
+    [basinQuarterAggregates, selectedBasinId, selectedQuarter]
+  );
 
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
   const totalRetired = useMemo(() => retirements.reduce((sum, x) => sum + x.quantity, 0), [retirements]);
@@ -255,36 +356,73 @@ export default function Page() {
     });
   }
 
+  function approveAggregateForIssuance() {
+    if (!selectedAggregate) {
+      addTimeline('No basin-quarter aggregate available to approve.');
+      return;
+    }
+    const approval = {
+      basinId: selectedAggregate.basinId,
+      quarter: selectedAggregate.quarter,
+      approvedAt: new Date().toISOString(),
+      reviewer: 'Demo Reviewer',
+      methodologyVersion: METHOD_VERSION,
+      usedM3: selectedAggregate.usedM3,
+      eligibleM3: selectedAggregate.eligibleM3,
+      schoolIds: selectedAggregate.schoolIds
+    };
+    const key = `${approval.basinId}::${approval.quarter}`;
+    setApprovedIssuanceBasis((prev) => ({ ...prev, [key]: approval }));
+    addTimeline(
+      `Approved aggregate ${approval.basinId} ${approval.quarter}: ${fmt(approval.usedM3)} m³ measured, ${fmt(approval.eligibleM3)} m³ eligible.`
+    );
+    recordAudit({
+      type: 'aggregate_certification_approved',
+      ...approval
+    });
+  }
+
   function issueWbt() {
     if (!selectedProject) return;
     const review = reviews[selectedProject.projectId];
     if (!review || review.decision !== 'approve') {
-      addTimeline(`Issuance blocked for ${selectedProject.projectId}: review approval required.`);
+      addTimeline(`Issuance blocked for ${selectedProject.projectId}: project review approval required.`);
+      return;
+    }
+    const key = `${selectedBasinId}::${selectedQuarter}`;
+    const approval = approvedIssuanceBasis[key];
+    if (!approval) {
+      addTimeline(`Issuance blocked: basin-quarter ${selectedBasinId || 'N/A'} ${selectedQuarter} is not approved.`);
       return;
     }
 
-    const latest = selectedSchool?.meter?.latestReadingM3 || 0;
-    const eligibleVolume = Number((latest * 0.85).toFixed(2));
+    const eligibleVolume = Number(approval.eligibleM3 || 0);
     const quantity = Math.max(1, Math.floor(eligibleVolume));
 
     const batch = {
       issuanceId: `ISS-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
       projectId: selectedProject.projectId,
       projectName: selectedProject.projectName,
+      basinId: approval.basinId,
+      quarter: approval.quarter,
+      contributingSchools: approval.schoolIds,
+      measuredVolumeM3: approval.usedM3,
       quantity,
       eligibleVolume,
       methodologyVersion: METHOD_VERSION,
-      reviewer: review.reviewer,
+      reviewer: approval.reviewer,
       period: new Date().toISOString().slice(0, 10),
       createdAt: new Date().toISOString()
     };
 
     setIssuances((x) => [batch, ...x]);
-    addTimeline(`Issued ${quantity} WBT from ${selectedProject.projectId}.`);
+    addTimeline(`Issued ${quantity} WBT from basin ${batch.basinId} ${batch.quarter} aggregate.`);
     recordAudit({
       type: 'issuance_created',
       issuanceId: batch.issuanceId,
       projectId: batch.projectId,
+      basinId: batch.basinId,
+      quarter: batch.quarter,
       quantity: batch.quantity,
       reviewer: batch.reviewer,
       methodologyVersion: batch.methodologyVersion
@@ -295,6 +433,10 @@ export default function Page() {
     if (!selectedProject) return;
     setSimBusy(true);
     try {
+      const monthKey = monthKeyFromDate();
+      const monthlyIndexRaw = Number(selectedRainProfile?.monthlySeasonalityIndex?.[monthKey] || 1);
+      const monthlyIndex = Number.isFinite(monthlyIndexRaw) ? monthlyIndexRaw : 1;
+      const seasonalMultiplier = Math.min(3.5, Math.max(0.4, monthlyIndex));
       const response = await fetch('/api/simulate', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -303,7 +445,12 @@ export default function Page() {
           deviceId: selectedProject.linkedDeviceIds[0],
           currentReadingM3: selectedSchool?.meter?.latestReadingM3 || 0,
           points: 4,
-          stepM3: 1.2,
+          stepM3: Number((1.2 * seasonalMultiplier).toFixed(2)),
+          seasonal: {
+            source: rainSeasonality?.source?.provider || 'NASA POWER',
+            month: monthKey,
+            monthlyIndex: Number(monthlyIndex.toFixed(3))
+          },
           sendToExistingApi: true
         })
       });
@@ -353,6 +500,8 @@ export default function Page() {
       purpose: retirePurpose,
       issuedFrom: sourceIssuance?.issuanceId || 'N/A',
       projectId: sourceIssuance?.projectId || selectedProject?.projectId || 'N/A',
+      basinId: sourceIssuance?.basinId || selectedProject?.location?.basinId || 'N/A',
+      quarter: sourceIssuance?.quarter || selectedQuarter,
       methodologyVersion: sourceIssuance?.methodologyVersion || METHOD_VERSION,
       reviewer: sourceIssuance?.reviewer || 'N/A',
       at: new Date().toISOString()
@@ -370,6 +519,8 @@ export default function Page() {
       reportId: `RPT-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
       buyer: retirement.buyer,
       projectId: retirement.projectId,
+      basinId: retirement.basinId,
+      quarter: retirement.quarter,
       location: selectedProject?.location || null,
       deviceReference: selectedProject?.linkedDeviceIds?.[0] || null,
       issuanceBatch: retirement.issuedFrom,
@@ -631,6 +782,24 @@ export default function Page() {
               </button>
               <StatusPill {...meterMeta(selectedSchool?.meter?.status || 'unknown')} />
             </div>
+            <p>
+              Seasonal rain multiplier (month {monthKeyFromDate()}):{' '}
+              <strong>{fmt(selectedRainProfile?.monthlySeasonalityIndex?.[monthKeyFromDate()] || 1)}x</strong>{' '}
+              {rainSeasonality?.source?.provider ? (
+                <span className="badge info">
+                  Source {rainSeasonality.source.provider} ({rainSeasonality.source.parameter || 'PRECTOTCORR'})
+                </span>
+              ) : null}
+            </p>
+            {rainSeasonality?.source?.docs ? (
+              <p>
+                Rain data docs:{' '}
+                <a href={rainSeasonality.source.docs} target="_blank" rel="noreferrer">
+                  {rainSeasonality.source.docs}
+                </a>
+              </p>
+            ) : null}
+            {rainLoadError ? <div className="code">{rainLoadError}</div> : null}
             <div className="code">{JSON.stringify(apiDownload?.records?.slice(0, 8) || [], null, 2)}</div>
           </div>
         </section>
@@ -659,6 +828,45 @@ export default function Page() {
                 Reject
               </button>
             </div>
+            <h3 style={{ marginTop: 20 }}>Basin + Quarter Aggregation (for issuance)</h3>
+            <p>
+              Certification now aggregates measured <code>utilizado</code> volume by basin and quarter before issuance.
+            </p>
+            <div className="row">
+              <select value={selectedBasinId} onChange={(e) => setSelectedBasinId(e.target.value)}>
+                {basinOptions.length === 0 ? <option value="">No basin data yet</option> : null}
+                {basinOptions.map((basinId) => (
+                  <option key={basinId} value={basinId}>
+                    {basinId}
+                  </option>
+                ))}
+              </select>
+              <select value={selectedQuarter} onChange={(e) => setSelectedQuarter(e.target.value)}>
+                {QUARTERS.map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+              </select>
+              <button disabled={!selectedAggregate} onClick={approveAggregateForIssuance}>
+                Approve basin-quarter aggregate
+              </button>
+            </div>
+            {selectedAggregate ? (
+              <div className="row">
+                <span className="badge info">Measured: {fmt(selectedAggregate.usedM3)} m³</span>
+                <span className="badge good">Eligible: {fmt(selectedAggregate.eligibleM3)} m³</span>
+                <span className="badge info">Records: {selectedAggregate.recordCount}</span>
+                <span className="badge info">Schools: {selectedAggregate.schoolIds.length}</span>
+              </div>
+            ) : (
+              <p>No ingested `utilizado` records available for this basin/quarter yet.</p>
+            )}
+            {approvedIssuanceBasis[`${selectedBasinId}::${selectedQuarter}`] ? (
+              <p>
+                <StatusPill tone="good" icon="check" label="Aggregate Approved for Issuance" />
+              </p>
+            ) : null}
             <div className="code">{JSON.stringify(selectedProject ? reviews[selectedProject.projectId] || {} : {}, null, 2)}</div>
           </div>
         </section>
@@ -669,9 +877,19 @@ export default function Page() {
           <div className="card">
             <h2>5) VWB Eligibility / WBT Issuance</h2>
             <p>
-              Issuance is approval-gated and uses deterministic demo logic: <code>eligibleVolume = latestMeter * 0.85</code>;
-              <code>WBT quantity = floor(eligibleVolume)</code>.
+              Issuance is approval-gated and uses certified basin-quarter aggregate volume:
+              <code>eligibleVolume = aggregatedUtilizadoM3 * 0.85</code>; <code>WBT quantity = floor(eligibleVolume)</code>.
             </p>
+            <div className="row">
+              <span className="badge info">Basin: {selectedBasinId || 'N/A'}</span>
+              <span className="badge info">Quarter: {selectedQuarter}</span>
+              {selectedAggregate ? (
+                <>
+                  <span className="badge info">Measured: {fmt(selectedAggregate.usedM3)} m³</span>
+                  <span className="badge good">Eligible: {fmt(selectedAggregate.eligibleM3)} m³</span>
+                </>
+              ) : null}
+            </div>
             <div className="row">
               <button disabled={!selectedProject} onClick={issueWbt}>
                 Issue WBT from selected project
@@ -683,7 +901,7 @@ export default function Page() {
               ) : (
                 issuances.map((x) => (
                   <div className="item" key={x.issuanceId}>
-                    <strong>{x.issuanceId}</strong> · {x.projectId} · {fmt(x.quantity)} WBT · reviewer {x.reviewer}
+                    <strong>{x.issuanceId}</strong> · {x.projectId} · basin {x.basinId} · {x.quarter} · {fmt(x.quantity)} WBT · reviewer {x.reviewer}
                   </div>
                 ))
               )}

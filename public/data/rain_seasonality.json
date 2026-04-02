@@ -1,0 +1,251 @@
+{
+  "source": {
+    "provider": "NASA POWER",
+    "parameter": "PRECTOTCORR",
+    "unit": "mm/day",
+    "docs": "https://power.larc.nasa.gov/docs/services/api/temporal/monthly/"
+  },
+  "generatedAt": "2026-04-02T21:35:10.217Z",
+  "schools": {
+    "15DPR0594Z": {
+      "schoolName": "PRIMARIA BENITO JUAREZ",
+      "lat": 19.54418,
+      "lon": -99.074364,
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR&community=AG&longitude=-99.074364&latitude=19.54418&start=2001&end=2025&format=JSON",
+      "monthlyAvgMmPerDay": {
+        "10": 2.082,
+        "11": 0.66,
+        "12": 0.2,
+        "01": 0.282,
+        "02": 0.402,
+        "03": 0.461,
+        "04": 0.745,
+        "05": 1.806,
+        "06": 4.538,
+        "07": 5.018,
+        "08": 5.03,
+        "09": 4.983
+      },
+      "monthlySeasonalityIndex": {
+        "10": 0.953,
+        "11": 0.302,
+        "12": 0.092,
+        "01": 0.129,
+        "02": 0.184,
+        "03": 0.211,
+        "04": 0.341,
+        "05": 0.827,
+        "06": 2.078,
+        "07": 2.298,
+        "08": 2.303,
+        "09": 2.282
+      },
+      "quarterlyAvgMmPerDay": {
+        "Q1": 0.382,
+        "Q2": 2.363,
+        "Q3": 5.01,
+        "Q4": 1.283
+      }
+    },
+    "15ETV0293A": {
+      "schoolName": "SECUNDARIA OFTV NO.0194 GRAL EMILIANO ZAPATA",
+      "lat": 19.1666583,
+      "lon": -98.7820067,
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR&community=AG&longitude=-98.7820067&latitude=19.1666583&start=2001&end=2025&format=JSON",
+      "monthlyAvgMmPerDay": {
+        "10": 2.434,
+        "11": 0.657,
+        "12": 0.227,
+        "01": 0.305,
+        "02": 0.341,
+        "03": 0.468,
+        "04": 0.821,
+        "05": 2.231,
+        "06": 5.333,
+        "07": 4.852,
+        "08": 5.428,
+        "09": 5.772
+      },
+      "monthlySeasonalityIndex": {
+        "10": 1.012,
+        "11": 0.273,
+        "12": 0.094,
+        "01": 0.127,
+        "02": 0.142,
+        "03": 0.195,
+        "04": 0.341,
+        "05": 0.927,
+        "06": 2.217,
+        "07": 2.017,
+        "08": 2.256,
+        "09": 2.399
+      },
+      "quarterlyAvgMmPerDay": {
+        "Q1": 0.371,
+        "Q2": 2.795,
+        "Q3": 5.351,
+        "Q4": 1.433
+      }
+    },
+    "15EBH0466T": {
+      "schoolName": "PREPARATORIA OFICIAL NO 271",
+      "lat": 19.083353,
+      "lon": -98.784394,
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR&community=AG&longitude=-98.784394&latitude=19.083353&start=2001&end=2025&format=JSON",
+      "monthlyAvgMmPerDay": {
+        "10": 2.434,
+        "11": 0.657,
+        "12": 0.227,
+        "01": 0.305,
+        "02": 0.341,
+        "03": 0.468,
+        "04": 0.821,
+        "05": 2.231,
+        "06": 5.333,
+        "07": 4.852,
+        "08": 5.428,
+        "09": 5.772
+      },
+      "monthlySeasonalityIndex": {
+        "10": 1.012,
+        "11": 0.273,
+        "12": 0.094,
+        "01": 0.127,
+        "02": 0.142,
+        "03": 0.195,
+        "04": 0.341,
+        "05": 0.927,
+        "06": 2.217,
+        "07": 2.017,
+        "08": 2.256,
+        "09": 2.399
+      },
+      "quarterlyAvgMmPerDay": {
+        "Q1": 0.371,
+        "Q2": 2.795,
+        "Q3": 5.351,
+        "Q4": 1.433
+      }
+    },
+    "15DPR0454Z": {
+      "schoolName": "PRIMARIA VICENTE GUERRERO",
+      "lat": 19.2423517,
+      "lon": -98.8458783,
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR&community=AG&longitude=-98.8458783&latitude=19.2423517&start=2001&end=2025&format=JSON",
+      "monthlyAvgMmPerDay": {
+        "10": 2.434,
+        "11": 0.657,
+        "12": 0.227,
+        "01": 0.305,
+        "02": 0.341,
+        "03": 0.468,
+        "04": 0.821,
+        "05": 2.231,
+        "06": 5.333,
+        "07": 4.852,
+        "08": 5.428,
+        "09": 5.772
+      },
+      "monthlySeasonalityIndex": {
+        "10": 1.012,
+        "11": 0.273,
+        "12": 0.094,
+        "01": 0.127,
+        "02": 0.142,
+        "03": 0.195,
+        "04": 0.341,
+        "05": 0.927,
+        "06": 2.217,
+        "07": 2.017,
+        "08": 2.256,
+        "09": 2.399
+      },
+      "quarterlyAvgMmPerDay": {
+        "Q1": 0.371,
+        "Q2": 2.795,
+        "Q3": 5.351,
+        "Q4": 1.433
+      }
+    },
+    "15DTV0170S": {
+      "schoolName": "TELESECUNDARIA IGNACIO ALLENDE",
+      "lat": 19.227573,
+      "lon": -98.91979,
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR&community=AG&longitude=-98.91979&latitude=19.227573&start=2001&end=2025&format=JSON",
+      "monthlyAvgMmPerDay": {
+        "10": 2.434,
+        "11": 0.657,
+        "12": 0.227,
+        "01": 0.305,
+        "02": 0.341,
+        "03": 0.468,
+        "04": 0.821,
+        "05": 2.231,
+        "06": 5.333,
+        "07": 4.852,
+        "08": 5.428,
+        "09": 5.772
+      },
+      "monthlySeasonalityIndex": {
+        "10": 1.012,
+        "11": 0.273,
+        "12": 0.094,
+        "01": 0.127,
+        "02": 0.142,
+        "03": 0.195,
+        "04": 0.341,
+        "05": 0.927,
+        "06": 2.217,
+        "07": 2.017,
+        "08": 2.256,
+        "09": 2.399
+      },
+      "quarterlyAvgMmPerDay": {
+        "Q1": 0.371,
+        "Q2": 2.795,
+        "Q3": 5.351,
+        "Q4": 1.433
+      }
+    },
+    "15EJN3378M": {
+      "schoolName": "PREESCOLAR RICARDO FLORES MAGON",
+      "lat": 19.3456217,
+      "lon": -98.9428083,
+      "requestUrl": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR&community=AG&longitude=-98.9428083&latitude=19.3456217&start=2001&end=2025&format=JSON",
+      "monthlyAvgMmPerDay": {
+        "10": 2.847,
+        "11": 0.982,
+        "12": 0.414,
+        "01": 0.436,
+        "02": 0.484,
+        "03": 0.634,
+        "04": 1.024,
+        "05": 2.025,
+        "06": 4.912,
+        "07": 4.764,
+        "08": 5.042,
+        "09": 5.598
+      },
+      "monthlySeasonalityIndex": {
+        "10": 1.172,
+        "11": 0.404,
+        "12": 0.17,
+        "01": 0.179,
+        "02": 0.199,
+        "03": 0.261,
+        "04": 0.421,
+        "05": 0.833,
+        "06": 2.021,
+        "07": 1.96,
+        "08": 2.075,
+        "09": 2.304
+      },
+      "quarterlyAvgMmPerDay": {
+        "Q1": 0.518,
+        "Q2": 2.654,
+        "Q3": 5.135,
+        "Q4": 1.67
+      }
+    }
+  }
+}
