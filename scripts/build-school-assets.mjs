@@ -4,6 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const sourceCsv = path.join(root, 'Background/Schools/school-data.csv');
 const outDir = path.join(root, 'public/data');
+const technicalPilotRoot = path.join(root, 'Background/Schools/BL_IU_Technical/Piloto escuelas');
 
 function parseCsv(text) {
   const rows = [];
@@ -130,6 +131,98 @@ function around(lat, lon, sizeDeg = 0.08) {
   ];
 }
 
+function relFromRoot(absPath) {
+  return path.relative(root, absPath).replaceAll(path.sep, '/');
+}
+
+function parsePrecipitationCsv(filePath) {
+  const text = fs.readFileSync(filePath, 'utf8');
+  const lines = text.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 3) return null;
+
+  const coordLine = lines[0] || '';
+  const lonMatch = coordLine.match(/LON:\s*(-?\d+(?:\.\d+)?)/i);
+  const latMatch = coordLine.match(/LAT:\s*(-?\d+(?:\.\d+)?)/i);
+
+  const headers = lines[1].split(',').map((x) => x.trim());
+  const years = headers.slice(1).map((y) => Number(y)).filter((n) => Number.isFinite(n));
+  const maxByYear = Object.fromEntries(years.map((y) => [String(y), 0]));
+
+  let maxDailyMm = 0;
+
+  for (const line of lines.slice(2)) {
+    const cols = line.split(',');
+    for (let i = 1; i < cols.length && i < headers.length; i += 1) {
+      const year = headers[i];
+      const value = Number(cols[i] || 0);
+      if (!Number.isFinite(value)) continue;
+      if (value > (maxByYear[year] || 0)) maxByYear[year] = value;
+      if (value > maxDailyMm) maxDailyMm = value;
+    }
+  }
+
+  const sortedYears = years.sort((a, b) => a - b);
+  const latestYear = sortedYears[sortedYears.length - 1];
+
+  return {
+    sourceFile: relFromRoot(filePath),
+    stationLon: lonMatch ? Number(lonMatch[1]) : null,
+    stationLat: latMatch ? Number(latMatch[1]) : null,
+    years: sortedYears,
+    annualCumulativeMaxMm: Object.fromEntries(
+      Object.entries(maxByYear).map(([year, mm]) => [year, Number(mm.toFixed(2))])
+    ),
+    latestYear,
+    latestYearTotalMm: latestYear ? Number((maxByYear[String(latestYear)] || 0).toFixed(2)) : null,
+    maxDailyMm: Number(maxDailyMm.toFixed(2))
+  };
+}
+
+function buildTechnicalIndex() {
+  const index = new Map();
+  if (!fs.existsSync(technicalPilotRoot)) return index;
+
+  const schoolDirs = fs
+    .readdirSync(technicalPilotRoot, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && /^\d/.test(d.name))
+    .map((d) => d.name);
+
+  for (const schoolId of schoolDirs) {
+    const baseDir = path.join(technicalPilotRoot, schoolId);
+    const allFiles = [];
+
+    function walk(dir) {
+      const items = fs.readdirSync(dir, { withFileTypes: true });
+      for (const item of items) {
+        const fp = path.join(dir, item.name);
+        if (item.isDirectory()) walk(fp);
+        else allFiles.push(fp);
+      }
+    }
+
+    walk(baseDir);
+
+    const pdfs = allFiles.filter((f) => f.toLowerCase().endsWith('.pdf'));
+    const images = allFiles.filter((f) => /\.(jpg|jpeg|png)$/i.test(f));
+    const precipitationFile = allFiles.find((f) => /precipitation_data/i.test(path.basename(f)) && f.endsWith('.csv'));
+
+    index.set(schoolId, {
+      basePath: relFromRoot(baseDir),
+      fileCount: allFiles.length,
+      pdfCount: pdfs.length,
+      imageCount: images.length,
+      reportFiles: pdfs.map((f) => ({
+        name: path.basename(f),
+        path: relFromRoot(f)
+      })),
+      photoSamples: images.slice(0, 3).map((f) => relFromRoot(f)),
+      precipitation: precipitationFile ? parsePrecipitationCsv(precipitationFile) : null
+    });
+  }
+
+  return index;
+}
+
 const csvText = fs.readFileSync(sourceCsv, 'utf8');
 const rows = parseCsv(csvText);
 if (rows.length < 2) {
@@ -144,6 +237,7 @@ const records = rows.slice(1).map((row) => {
   }
   return record;
 });
+const technicalBySchoolId = buildTechnicalIndex();
 
 const schools = records.map((record, index) => {
   const schoolIdKey = pickKey(record, ['ID_USUARIOSTAR']);
@@ -189,7 +283,8 @@ const schools = records.map((record, index) => {
     raw: {
       lastFollowUpDate: (followUpKey ? record[followUpKey] : '') || '',
       scallInUse: (scallKey ? record[scallKey] : '') || ''
-    }
+    },
+    technical: technicalBySchoolId.get(schoolId) || null
   };
 });
 
@@ -252,10 +347,20 @@ const projectsSeed = schools.map((school, i) => ({
   operator: school.operator,
   status: 'under_review',
   linkedDeviceIds: [school.meter.deviceId],
-  evidenceFiles: school.evidence.photoUrl ? [school.evidence.photoUrl] : [],
+  evidenceFiles: [
+    ...(school.evidence.photoUrl ? [school.evidence.photoUrl] : []),
+    ...((school.technical?.reportFiles || []).map((x) => x.path))
+  ],
   certificationReviewer: 'Pending assignment',
   methodologyStatus: 'draft',
-  notes: school.evidence.notes || ''
+  notes: school.evidence.notes || '',
+  technicalSummary: school.technical
+    ? {
+        reportCount: school.technical.pdfCount,
+        imageCount: school.technical.imageCount,
+        latestYearRainMm: school.technical.precipitation?.latestYearTotalMm ?? null
+      }
+    : null
 }));
 
 fs.mkdirSync(outDir, { recursive: true });

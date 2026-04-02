@@ -347,6 +347,7 @@ export default function Page() {
   }
 
   const aiForSelected = selectedProject ? runAiReviewRecommendation(selectedProject) : null;
+  const selectedTechnical = selectedSchool?.technical || null;
 
   return (
     <main className="page">
@@ -449,6 +450,36 @@ export default function Page() {
             Basins shown: {(basins.features || []).length}. Schools mapped: {schools.filter((s) => typeof s.lat === 'number').length}.
             Source: <span className="badge good">HydroBASINS (real only)</span>
           </p>
+        </div>
+
+        <div className="card">
+          <h2>2b) School Technical Dossier (BL_IU_Technical)</h2>
+          {!selectedSchool ? (
+            <p>Select a project to view school technical details.</p>
+          ) : !selectedTechnical ? (
+            <p>No BL_IU_Technical dossier found for school {selectedSchool.schoolId}.</p>
+          ) : (
+            <>
+              <p>
+                <strong>{selectedSchool.schoolName}</strong> ({selectedSchool.schoolId})
+              </p>
+              <div className="row">
+                <span className="badge info">Files: {selectedTechnical.fileCount}</span>
+                <span className="badge info">Reports: {selectedTechnical.pdfCount}</span>
+                <span className="badge info">Photos: {selectedTechnical.imageCount}</span>
+                <span className="badge info">
+                  Rain {selectedTechnical.precipitation?.latestYear || 'N/A'}:{' '}
+                  {fmt(selectedTechnical.precipitation?.latestYearTotalMm || 0)} mm
+                </span>
+              </div>
+              <p>
+                Precipitation station: {selectedTechnical.precipitation?.stationLat ?? 'N/A'},{' '}
+                {selectedTechnical.precipitation?.stationLon ?? 'N/A'} · Peak cumulative day value:{' '}
+                {fmt(selectedTechnical.precipitation?.maxDailyMm || 0)} mm
+              </p>
+              <div className="code">{JSON.stringify(selectedTechnical.reportFiles || [], null, 2)}</div>
+            </>
+          )}
         </div>
 
         <div className="card">

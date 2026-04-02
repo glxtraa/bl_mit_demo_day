@@ -106,6 +106,8 @@ export default function RealMapClient({ schools, basins, selectedDeviceId }) {
                     Device: {school?.meter?.deviceId}
                     <br />
                     Reading: {school?.meter?.latestReadingM3 ?? 0} m3
+                    <br />
+                    Dossier files: {school?.technical?.fileCount ?? 0}
                   </div>
                 </Popup>
               </CircleMarker>

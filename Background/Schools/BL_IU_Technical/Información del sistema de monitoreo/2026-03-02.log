@@ -1,0 +1,630 @@
+[2026-02-27 23:55:15] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '5.33',
+  'catched_at' => '2025-12-06 23:55:07',
+)
+[2026-02-27 23:55:23] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '5.33',
+  'catched_at' => '2025-12-06 23:55:07',
+)
+[2026-02-27 23:55:28] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '224.40',
+  'catched_at' => '2025-11-11 23:55:04',
+)
+[2026-02-27 23:55:35] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2025-12-08 23:55:12',
+)
+[2026-02-27 23:55:37] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '224.40',
+  'catched_at' => '2025-11-11 23:55:04',
+)
+[2026-02-27 23:55:43] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2025-12-08 23:55:12',
+)
+[2026-02-27 23:55:48] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '4.77',
+  'catched_at' => '2025-12-06 23:54:58',
+)
+[2026-02-27 23:55:54] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-09 23:55:06',
+)
+[2026-02-27 23:55:56] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '4.77',
+  'catched_at' => '2025-12-06 23:54:58',
+)
+[2026-02-27 23:56:03] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-09 23:55:06',
+)
+[2026-02-27 23:56:08] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-08 23:55:02',
+)
+[2026-02-27 23:56:13] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '56.10',
+  'catched_at' => '2025-10-15 23:55:10',
+)
+[2026-02-27 23:56:14] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-10 23:55:07',
+)
+[2026-02-27 23:56:16] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-08 23:55:02',
+)
+[2026-02-27 23:56:21] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '56.10',
+  'catched_at' => '2025-10-15 23:55:10',
+)
+[2026-02-27 23:56:22] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-10 23:55:07',
+)
+[2026-02-27 23:56:28] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '3.93',
+  'catched_at' => '2025-12-09 23:55:00',
+)
+[2026-02-27 23:56:33] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-06 23:55:04',
+)
+[2026-02-27 23:56:34] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2026-01-16 23:54:57',
+)
+[2026-02-27 23:56:36] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '3.93',
+  'catched_at' => '2025-12-09 23:55:00',
+)
+[2026-02-27 23:56:41] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-06 23:55:04',
+)
+[2026-02-27 23:56:42] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2026-01-16 23:54:57',
+)
+[2026-02-27 23:56:48] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-11 23:54:54',
+)
+[2026-02-27 23:56:53] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '1.12',
+  'catched_at' => '2026-01-18 23:55:02',
+)
+[2026-02-27 23:56:56] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-11 23:54:54',
+)
+[2026-02-27 23:57:02] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '1.12',
+  'catched_at' => '2026-01-18 23:55:02',
+)
+[2026-02-27 23:57:07] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '2.52',
+  'catched_at' => '2026-01-16 23:55:03',
+)
+[2026-02-27 23:57:12] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-08 23:54:58',
+)
+[2026-02-27 23:57:16] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '2.52',
+  'catched_at' => '2026-01-16 23:55:03',
+)
+[2026-02-27 23:57:21] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-08 23:54:58',
+)
+[2026-02-27 23:57:27] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.56',
+  'catched_at' => '2026-01-17 23:55:01',
+)
+[2026-02-27 23:57:36] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.56',
+  'catched_at' => '2026-01-17 23:55:01',
+)
+[2026-02-27 23:57:52] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.68',
+  'catched_at' => '2025-12-09 23:54:58',
+)
+[2026-02-27 23:58:00] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.68',
+  'catched_at' => '2025-12-09 23:54:58',
+)
+[2026-02-27 23:58:31] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.96',
+  'catched_at' => '2026-01-16 23:54:53',
+)
+[2026-02-27 23:58:39] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.96',
+  'catched_at' => '2026-01-16 23:54:53',
+)
+[2026-02-27 23:59:11] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.28',
+  'catched_at' => '2026-01-21 23:55:07',
+)
+[2026-02-27 23:59:19] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.28',
+  'catched_at' => '2026-01-21 23:55:07',
+)
+[2026-02-28 23:55:16] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '5.33',
+  'catched_at' => '2025-12-06 23:55:07',
+)
+[2026-02-28 23:55:25] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '5.33',
+  'catched_at' => '2025-12-06 23:55:07',
+)
+[2026-02-28 23:55:36] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2025-12-08 23:55:12',
+)
+[2026-02-28 23:55:45] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2025-12-08 23:55:12',
+)
+[2026-02-28 23:55:56] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-09 23:55:06',
+)
+[2026-02-28 23:56:04] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-09 23:55:06',
+)
+[2026-02-28 23:56:14] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '56.10',
+  'catched_at' => '2025-10-15 23:55:10',
+)
+[2026-02-28 23:56:16] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-10 23:55:07',
+)
+[2026-02-28 23:56:23] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '56.10',
+  'catched_at' => '2025-10-15 23:55:10',
+)
+[2026-02-28 23:56:24] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-10 23:55:07',
+)
+[2026-02-28 23:56:34] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-06 23:55:04',
+)
+[2026-02-28 23:56:36] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2026-01-16 23:54:57',
+)
+[2026-02-28 23:56:43] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-06 23:55:04',
+)
+[2026-02-28 23:56:44] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2026-01-16 23:54:57',
+)
+[2026-02-28 23:56:55] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '1.12',
+  'catched_at' => '2026-01-18 23:55:02',
+)
+[2026-02-28 23:57:04] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '1.12',
+  'catched_at' => '2026-01-18 23:55:02',
+)
+[2026-02-28 23:57:14] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-08 23:54:58',
+)
+[2026-02-28 23:57:22] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-08 23:54:58',
+)
+[2026-02-28 23:57:54] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.68',
+  'catched_at' => '2025-12-09 23:54:58',
+)
+[2026-02-28 23:58:02] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.68',
+  'catched_at' => '2025-12-09 23:54:58',
+)
+[2026-02-28 23:58:33] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.96',
+  'catched_at' => '2026-01-16 23:54:53',
+)
+[2026-02-28 23:58:41] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.96',
+  'catched_at' => '2026-01-16 23:54:53',
+)
+[2026-02-28 23:59:13] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.28',
+  'catched_at' => '2026-01-21 23:55:07',
+)
+[2026-02-28 23:59:21] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.28',
+  'catched_at' => '2026-01-21 23:55:07',
+)
+[2026-03-01 15:06:51] local.DEBUG: array (
+  'tlaloque_id' => '6e727cfc-5351-4c41-ad3f-82ccbbcb07de',
+  'millimeters' => '118.80',
+  'catched_at' => '2026-03-01 13:02:45',
+)
+[2026-03-01 16:42:46] local.DEBUG: array (
+  'tlaloque_id' => 'd912939b-f5b3-44bf-b07c-5bde01afc789',
+  'millimeters' => '1.68',
+  'catched_at' => '2026-03-01 16:42:45',
+)
+[2026-03-01 23:55:16] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '5.33',
+  'catched_at' => '2025-12-06 23:55:07',
+)
+[2026-03-01 23:55:24] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '224.40',
+  'catched_at' => '2025-11-11 23:55:04',
+)
+[2026-03-01 23:55:25] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '5.33',
+  'catched_at' => '2025-12-06 23:55:07',
+)
+[2026-03-01 23:55:32] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '224.40',
+  'catched_at' => '2025-11-11 23:55:04',
+)
+[2026-03-01 23:55:36] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2025-12-08 23:55:12',
+)
+[2026-03-01 23:55:44] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '4.77',
+  'catched_at' => '2025-12-06 23:54:58',
+)
+[2026-03-01 23:55:44] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2025-12-08 23:55:12',
+)
+[2026-03-01 23:55:52] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '4.77',
+  'catched_at' => '2025-12-06 23:54:58',
+)
+[2026-03-01 23:55:56] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-09 23:55:06',
+)
+[2026-03-01 23:56:04] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-08 23:55:02',
+)
+[2026-03-01 23:56:04] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-09 23:55:06',
+)
+[2026-03-01 23:56:09] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '56.10',
+  'catched_at' => '2025-10-15 23:55:10',
+)
+[2026-03-01 23:56:12] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-08 23:55:02',
+)
+[2026-03-01 23:56:15] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-10 23:55:07',
+)
+[2026-03-01 23:56:17] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '56.10',
+  'catched_at' => '2025-10-15 23:55:10',
+)
+[2026-03-01 23:56:24] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '3.93',
+  'catched_at' => '2025-12-09 23:55:00',
+)
+[2026-03-01 23:56:24] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-10 23:55:07',
+)
+[2026-03-01 23:56:29] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-06 23:55:04',
+)
+[2026-03-01 23:56:32] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '3.93',
+  'catched_at' => '2025-12-09 23:55:00',
+)
+[2026-03-01 23:56:35] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2026-01-16 23:54:57',
+)
+[2026-03-01 23:56:37] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.84',
+  'catched_at' => '2025-12-06 23:55:04',
+)
+[2026-03-01 23:56:43] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-11 23:54:54',
+)
+[2026-03-01 23:56:44] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '3.09',
+  'catched_at' => '2026-01-16 23:54:57',
+)
+[2026-03-01 23:56:52] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-11 23:54:54',
+)
+[2026-03-01 23:56:55] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '1.12',
+  'catched_at' => '2026-01-18 23:55:02',
+)
+[2026-03-01 23:57:03] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '2.52',
+  'catched_at' => '2026-01-16 23:55:03',
+)
+[2026-03-01 23:57:03] local.DEBUG: array (
+  'tlaloque_id' => '124c0815-ffba-4866-84e0-2d889fb66be3',
+  'millimeters' => '1.12',
+  'catched_at' => '2026-01-18 23:55:02',
+)
+[2026-03-01 23:57:08] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-08 23:54:58',
+)
+[2026-03-01 23:57:12] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '2.52',
+  'catched_at' => '2026-01-16 23:55:03',
+)
+[2026-03-01 23:57:17] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-08 23:54:58',
+)
+[2026-03-01 23:57:23] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.56',
+  'catched_at' => '2026-01-17 23:55:01',
+)
+[2026-03-01 23:57:31] local.DEBUG: array (
+  'tlaloque_id' => '40860b86-45da-42ee-a9f4-a9e4e8c9e5d9',
+  'millimeters' => '0.56',
+  'catched_at' => '2026-01-17 23:55:01',
+)
+[2026-03-01 23:57:48] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.68',
+  'catched_at' => '2025-12-09 23:54:58',
+)
+[2026-03-01 23:57:56] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.68',
+  'catched_at' => '2025-12-09 23:54:58',
+)
+[2026-03-01 23:58:27] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.96',
+  'catched_at' => '2026-01-16 23:54:53',
+)
+[2026-03-01 23:58:36] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '1.96',
+  'catched_at' => '2026-01-16 23:54:53',
+)
+[2026-03-01 23:59:07] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.28',
+  'catched_at' => '2026-01-21 23:55:07',
+)
+[2026-03-01 23:59:15] local.DEBUG: array (
+  'tlaloque_id' => '015a53c5-14f8-401c-aa93-5136f2a7fe2a',
+  'millimeters' => '0.28',
+  'catched_at' => '2026-01-21 23:55:07',
+)
+[2026-03-02 15:34:20] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-06 00:33:48',
+)
+[2026-03-02 15:34:28] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-06 00:33:48',
+)
+[2026-03-02 15:34:40] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:47:34',
+)
+[2026-03-02 15:34:48] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:47:34',
+)
+[2026-03-02 15:35:00] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:51:59',
+)
+[2026-03-02 15:35:08] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:51:59',
+)
+[2026-03-02 15:35:20] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:55:19',
+)
+[2026-03-02 15:35:28] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:55:19',
+)
+[2026-03-02 15:37:14] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-06 00:33:48',
+)
+[2026-03-02 15:37:22] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-06 00:33:48',
+)
+[2026-03-02 15:37:34] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:47:34',
+)
+[2026-03-02 15:37:42] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:47:34',
+)
+[2026-03-02 15:37:54] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:51:59',
+)
+[2026-03-02 15:38:02] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:51:59',
+)
+[2026-03-02 15:38:14] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:55:19',
+)
+[2026-03-02 15:38:22] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:55:19',
+)
+[2026-03-02 16:03:24] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-06 00:33:48',
+)
+[2026-03-02 16:03:33] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.56',
+  'catched_at' => '2025-12-06 00:33:48',
+)
+[2026-03-02 16:03:44] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:47:34',
+)
+[2026-03-02 16:03:53] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:47:34',
+)
+[2026-03-02 16:04:04] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:51:59',
+)
+[2026-03-02 16:04:12] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:51:59',
+)
+[2026-03-02 16:04:24] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:55:19',
+)
+[2026-03-02 16:04:33] local.DEBUG: array (
+  'tlaloque_id' => 'eca340c2-42f4-46ad-ae3f-60bb3397d9b3',
+  'millimeters' => '0.28',
+  'catched_at' => '2025-12-06 05:55:19',
+)
