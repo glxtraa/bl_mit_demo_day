@@ -48,7 +48,7 @@ function basinLabel(feature) {
   return props.HYBAS_ID || props.basinId || 'Unknown basin';
 }
 
-export default function RealMapClient({ schools, basins, selectedDeviceId }) {
+export default function RealMapClient({ schools, basins, selectedDeviceId, onSelectSchool }) {
   const mappedSchools = useMemo(() => schools.filter((s) => schoolCoords(s)), [schools]);
   const bounds = useMemo(() => getBounds(mappedSchools, basins), [mappedSchools, basins]);
 
@@ -87,6 +87,11 @@ export default function RealMapClient({ schools, basins, selectedDeviceId }) {
                 key={school.schoolId}
                 center={coord}
                 radius={active ? 10 : 7}
+                eventHandlers={{
+                  click: () => {
+                    if (onSelectSchool) onSelectSchool(school);
+                  }
+                }}
                 pathOptions={{
                   color: active ? '#b43434' : '#0b556f',
                   fillColor: active ? '#e75b5b' : '#12708e',

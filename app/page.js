@@ -121,6 +121,16 @@ export default function Page() {
   const totalRetired = useMemo(() => retirements.reduce((sum, x) => sum + x.quantity, 0), [retirements]);
   const availableBalance = Math.max(0, totalIssued - totalRetired);
 
+  function selectSchoolProjectBySchoolId(schoolId) {
+    const school = schools.find((s) => s.schoolId === schoolId);
+    if (!school) return;
+    const project = projects.find((p) => (p.linkedDeviceIds || []).includes(school?.meter?.deviceId));
+    if (project) {
+      setSelectedProjectId(project.projectId);
+      addTimeline(`Selected ${school.schoolName} from map/dossier controls.`);
+    }
+  }
+
   function addTimeline(text) {
     setTimeline((prev) => [{ at: new Date().toISOString(), text }, ...prev].slice(0, 60));
   }
@@ -474,10 +484,30 @@ export default function Page() {
         <section className="wizardScreen">
           <div className="card">
             <h2>2) Basin vs School Localization</h2>
+            <div className="row">
+              <select
+                value={selectedSchool?.schoolId || ''}
+                onChange={(e) => selectSchoolProjectBySchoolId(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select school
+                </option>
+                {schools.map((s) => (
+                  <option key={s.schoolId} value={s.schoolId}>
+                    {s.schoolName} ({s.schoolId})
+                  </option>
+                ))}
+              </select>
+            </div>
             {basinError ? (
               <div className="code">{basinError}</div>
             ) : (
-              <RealMapClient schools={schools} basins={basins} selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null} />
+              <RealMapClient
+                schools={schools}
+                basins={basins}
+                selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null}
+                onSelectSchool={(school) => selectSchoolProjectBySchoolId(school.schoolId)}
+              />
             )}
             <p>
               Basins shown: {(basins.features || []).length}. Schools mapped: {schools.filter((s) => typeof s.lat === 'number').length}. Source:{' '}
