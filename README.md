@@ -8,6 +8,7 @@ Vercel-ready end-to-end demo for MIT Demo Day covering:
 - Permissioned buyer retirement
 - Certificate/report generation
 - Basin vs school localization map using provided school dataset
+  - Uses real OpenStreetMap tiles (Leaflet)
 
 ## 1) Prepare data assets
 
@@ -22,6 +23,33 @@ This builds:
 - `public/data/basins.geojson`
 
 from `Background/Schools/school-data.csv`.
+
+## Real HydroBASINS (recommended)
+
+The app will automatically use real basins from:
+
+- `public/data/hydrobasins_l6_schools.geojson`
+
+If that file is missing, it falls back to demo polygons in `public/data/basins.geojson`.
+
+### Generate real matched basins
+
+1. Download HydroBASINS Level 6 for North America:
+   - `https://data.hydrosheds.org/file/hydrobasins/standard/hybas_na_lev06_v1c.zip`
+2. Convert the shapefile to GeoJSON (example with GDAL):
+
+```bash
+ogr2ogr -f GeoJSON public/data/hybas_na_lev06_v1c.geojson hybas_na_lev06_v1c.shp
+```
+
+3. Extract only polygons containing school points:
+
+```bash
+npm run extract:basins -- \
+  --basins public/data/hybas_na_lev06_v1c.geojson \
+  --schools public/data/schools.cleaned.json \
+  --output public/data/hydrobasins_l6_schools.geojson
+```
 
 ## 2) Run locally
 

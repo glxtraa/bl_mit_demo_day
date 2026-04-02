@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 const BUYERS = [
   { id: 'buyer-1', name: 'Acme Manufacturing', approved: true, role: 'buyer' },
@@ -26,16 +27,7 @@ function meterBadge(status) {
   return 'bad';
 }
 
-function toPolygonPath(points, bounds, width, height) {
-  return points
-    .map(([lon, lat], idx) => {
-      const x = ((lon - bounds.minLon) / (bounds.maxLon - bounds.minLon || 1)) * width;
-      const y = height - ((lat - bounds.minLat) / (bounds.maxLat - bounds.minLat || 1)) * height;
-      return `${idx === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(' ')
-    .concat(' Z');
-}
+const RealMapClient = dynamic(() => import('@/components/RealMapClient'), { ssr: false });
 
 export default function Page() {
   const [schools, setSchools] = useState([]);
@@ -59,24 +51,48 @@ export default function Page() {
   const [simBusy, setSimBusy] = useState(false);
   const [apiDownload, setApiDownload] = useState(null);
   const [lastReport, setLastReport] = useState(null);
+  const [usingRealBasins, setUsingRealBasins] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/data/schools.cleaned.json').then((r) => r.json()),
-      fetch('/data/projects.seed.json').then((r) => r.json()),
-      fetch('/data/basins.geojson').then((r) => r.json()),
-      fetch('/api/download').then((r) => r.json())
-    ]).then(([schoolsData, projectsData, basinsData, downloadData]) => {
+    async function load() {
+      const [schoolsData, projectsData, downloadData] = await Promise.all([
+        fetch('/data/schools.cleaned.json').then((r) => r.json()),
+        fetch('/data/projects.seed.json').then((r) => r.json()),
+        fetch('/api/download').then((r) => r.json())
+      ]);
+
+      let basinsData = { type: 'FeatureCollection', features: [] };
+      let real = false;
+      try {
+        const realResponse = await fetch('/data/hydrobasins_l6_schools.geojson');
+        if (realResponse.ok) {
+          basinsData = await realResponse.json();
+          real = true;
+        } else {
+          basinsData = await fetch('/data/basins.geojson').then((r) => r.json());
+        }
+      } catch (_error) {
+        basinsData = await fetch('/data/basins.geojson').then((r) => r.json());
+      }
+
       setSchools(schoolsData);
       setProjects(projectsData);
       setBasins(basinsData);
+      setUsingRealBasins(real);
       setSelectedProjectId(projectsData[0]?.projectId || '');
       setApiDownload(downloadData);
       setTimeline((t) => [
         ...t,
-        { at: new Date().toISOString(), text: `Loaded ${projectsData.length} seeded projects and ${basinsData.features.length} basins.` }
+        {
+          at: new Date().toISOString(),
+          text: `Loaded ${projectsData.length} seeded projects and ${basinsData.features.length} ${
+            real ? 'HydroBASINS' : 'fallback'
+          } basins.`
+        }
       ]);
-    });
+    }
+
+    load();
   }, []);
 
   const selectedProject = useMemo(
@@ -93,24 +109,6 @@ export default function Page() {
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
   const totalRetired = useMemo(() => retirements.reduce((sum, x) => sum + x.quantity, 0), [retirements]);
   const availableBalance = Math.max(0, totalIssued - totalRetired);
-
-  const mapBounds = useMemo(() => {
-    const coords = [];
-    for (const s of schools) {
-      if (typeof s.lon === 'number' && typeof s.lat === 'number') coords.push([s.lon, s.lat]);
-    }
-    for (const feature of basins.features || []) {
-      const ring = feature?.geometry?.coordinates?.[0] || [];
-      for (const [lon, lat] of ring) coords.push([lon, lat]);
-    }
-    if (!coords.length) return { minLon: -100, maxLon: -98, minLat: 18, maxLat: 20 };
-    return {
-      minLon: Math.min(...coords.map((p) => p[0])),
-      maxLon: Math.max(...coords.map((p) => p[0])),
-      minLat: Math.min(...coords.map((p) => p[1])),
-      maxLat: Math.max(...coords.map((p) => p[1]))
-    };
-  }, [schools, basins]);
 
   function addTimeline(text) {
     setTimeline((prev) => [{ at: new Date().toISOString(), text }, ...prev].slice(0, 60));
@@ -435,22 +433,14 @@ export default function Page() {
 
         <div className="card">
           <h2>2) Basin vs School Localization</h2>
-          <svg viewBox="0 0 1000 420" className="mapSvg" role="img" aria-label="Basin versus school map">
-            {(basins.features || []).map((feature) => {
-              const coords = feature.geometry?.coordinates?.[0] || [];
-              const d = toPolygonPath(coords, mapBounds, 1000, 420);
-              return <path key={feature.properties.basinId} d={d} fill="rgba(12,156,203,0.16)" stroke="#0c9ccb" strokeWidth="1.5" />;
-            })}
-            {schools.map((s, idx) => {
-              if (typeof s.lon !== 'number' || typeof s.lat !== 'number') return null;
-              const x = ((s.lon - mapBounds.minLon) / (mapBounds.maxLon - mapBounds.minLon || 1)) * 1000;
-              const y = 420 - ((s.lat - mapBounds.minLat) / (mapBounds.maxLat - mapBounds.minLat || 1)) * 420;
-              const active = selectedProject?.linkedDeviceIds?.[0] === s.meter?.deviceId;
-              return <circle key={`${s.schoolId}-${idx}`} cx={x} cy={y} r={active ? 7 : 4.5} fill={active ? '#b43434' : '#116283'} />;
-            })}
-          </svg>
+          <RealMapClient
+            schools={schools}
+            basins={basins}
+            selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null}
+          />
           <p>
             Basins shown: {(basins.features || []).length}. Schools mapped: {schools.filter((s) => typeof s.lat === 'number').length}.
+            Source: <span className={`badge ${usingRealBasins ? 'good' : 'warn'}`}>{usingRealBasins ? 'HydroBASINS (real)' : 'Fallback demo polygons'}</span>
           </p>
         </div>
 
