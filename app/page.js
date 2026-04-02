@@ -39,6 +39,38 @@ function meterBadge(status) {
   return 'bad';
 }
 
+function statusMeta(status) {
+  if (status === 'approved') return { tone: 'good', icon: 'check', label: 'Approved' };
+  if (status === 'under_review') return { tone: 'warn', icon: 'clock', label: 'Under Review' };
+  if (status === 'draft') return { tone: 'info', icon: 'doc', label: 'Draft' };
+  if (status === 'rejected') return { tone: 'bad', icon: 'x', label: 'Rejected' };
+  if (status === 'suspended') return { tone: 'bad', icon: 'pause', label: 'Suspended' };
+  return { tone: 'info', icon: 'dot', label: status || 'Unknown' };
+}
+
+function meterMeta(status) {
+  if (status === 'online') return { tone: 'good', icon: 'wifi', label: 'Meter Online' };
+  if (status === 'delayed') return { tone: 'warn', icon: 'clock', label: 'Meter Delayed' };
+  if (status === 'suspect') return { tone: 'bad', icon: 'warn', label: 'Meter Suspect' };
+  return { tone: 'info', icon: 'dot', label: 'Meter Unknown' };
+}
+
+function reviewMeta(decision) {
+  if (decision === 'approve') return { tone: 'good', icon: 'check', label: 'Human Approved' };
+  if (decision === 'request_info') return { tone: 'warn', icon: 'warn', label: 'Needs Info' };
+  if (decision === 'reject') return { tone: 'bad', icon: 'x', label: 'Rejected' };
+  return { tone: 'info', icon: 'dot', label: 'No Decision' };
+}
+
+function StatusPill({ tone, icon, label }) {
+  return (
+    <span className={`statusPill ${tone}`}>
+      <span className={`statusIcon ${icon}`} aria-hidden="true" />
+      {label}
+    </span>
+  );
+}
+
 const RealMapClient = dynamic(() => import('@/components/RealMapClient'), { ssr: false });
 
 export default function Page() {
@@ -466,7 +498,7 @@ export default function Page() {
                 <div key={p.projectId} className="item">
                   <strong>{p.projectId}</strong> · {p.projectName}
                   <div>
-                    <span className={`badge ${statusBadge(p.status)}`}>{p.status}</span>{' '}
+                    <StatusPill {...statusMeta(p.status)} />{' '}
                     <span className="badge info">{p.projectTypeLabel || SCHOOL_PROJECT_TYPE_LABEL}</span>{' '}
                     <span className="badge info">{p.location?.basinId}</span>
                   </div>
@@ -597,9 +629,7 @@ export default function Page() {
               <button disabled={!selectedProject || simBusy} onClick={runSimulation}>
                 {simBusy ? 'Simulating...' : 'Simulate + send to APIs'}
               </button>
-              <span className={`badge ${meterBadge(selectedSchool?.meter?.status || 'suspect')}`}>
-                meter {selectedSchool?.meter?.status || 'unknown'}
-              </span>
+              <StatusPill {...meterMeta(selectedSchool?.meter?.status || 'unknown')} />
             </div>
             <div className="code">{JSON.stringify(apiDownload?.records?.slice(0, 8) || [], null, 2)}</div>
           </div>
@@ -614,6 +644,9 @@ export default function Page() {
               AI recommendation: <strong>{aiForSelected?.recommendation || 'N/A'}</strong> · confidence {fmt((aiForSelected?.confidence || 0) * 100)}%
             </p>
             <p>{aiForSelected?.summary}</p>
+            <div className="row">
+              <StatusPill {...reviewMeta(reviews[selectedProject?.projectId || '']?.decision)} />
+            </div>
             <p>Missing evidence: {aiForSelected?.missing?.length ? aiForSelected.missing.join(', ') : 'None'}</p>
             <div className="row">
               <button disabled={!selectedProject} onClick={() => saveReview('approve')}>
