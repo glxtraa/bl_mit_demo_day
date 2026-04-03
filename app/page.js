@@ -507,6 +507,20 @@ export default function Page() {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [certificationData, selectedBasinId]);
   const selectedAggregateApproval = approvedIssuanceBasis[`${selectedBasinId}::${selectedQuarter}`] || null;
+  const currentStepMeta = steps.find((s) => s.id === currentStep) || steps[0];
+  const stepProgressPct = Math.round((currentStep / steps.length) * 100);
+  const workflowStatus = useMemo(
+    () => [
+      { label: 'Project', done: projects.length > 0 },
+      { label: 'Map', done: (basins?.features?.length || 0) > 0 && Boolean(selectedSchool) },
+      { label: 'Ingestion', done: (apiDownload?.records?.length || 0) > 0 },
+      { label: 'Certification', done: Object.keys(approvedIssuanceBasis || {}).length > 0 },
+      { label: 'Issuance', done: issuances.length > 0 },
+      { label: 'Retirement', done: retirements.length > 0 },
+      { label: 'Report', done: Boolean(lastReport) }
+    ],
+    [projects.length, basins, selectedSchool, apiDownload, approvedIssuanceBasis, issuances.length, retirements.length, lastReport]
+  );
 
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
   const totalRetired = useMemo(() => retirements.reduce((sum, x) => sum + x.quantity, 0), [retirements]);
@@ -876,6 +890,15 @@ export default function Page() {
       </section>
 
       <section className="stepperWrap card">
+        <div className="stepNow">
+          <strong>
+            Step {currentStep} of {steps.length}: {currentStepMeta.title}
+          </strong>
+          <span className="badge info">{stepProgressPct}%</span>
+        </div>
+        <div className="stepProgress">
+          <div className="stepProgressFill" style={{ width: `${stepProgressPct}%` }} />
+        </div>
         <div className="stepper">
           {steps.map((step) => (
             <button
@@ -895,6 +918,13 @@ export default function Page() {
           <button disabled={currentStep === steps.length} onClick={() => setCurrentStep((s) => Math.min(steps.length, s + 1))}>
             Next
           </button>
+        </div>
+        <div className="workflowStrip">
+          {workflowStatus.map((s) => (
+            <span key={s.label} className={`workflowItem ${s.done ? 'done' : 'pending'}`}>
+              {s.label}
+            </span>
+          ))}
         </div>
       </section>
       <section className="card statusBoard">
@@ -1142,6 +1172,12 @@ export default function Page() {
               <span className="badge info">
                 Active source: {certificationSourceMode === 'api' ? 'API' : `Upload (${certificationUploadName || 'file'})`}
               </span>
+              <a className="badge good" href="/data/sscap_2025_weekly_api_download.json" download>
+                Download Demo Upload JSON
+              </a>
+              <a className="badge info" href="/data/sscap_2025_weekly_summary.json" download>
+                Download Demo Summary
+              </a>
             </div>
             <h3>SSCAP Pipeline (Colab-aligned)</h3>
             <p>

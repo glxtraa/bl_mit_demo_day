@@ -78,6 +78,28 @@ a {
   margin-bottom: 12px;
 }
 
+.stepNow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stepProgress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #deebf4;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.stepProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #0c9ccb 0%, #2ec4b6 100%);
+}
+
 .stepper {
   display: flex;
   gap: 8px;
@@ -128,6 +150,33 @@ a {
 
 .stepChip.done span {
   background: #ccefdc;
+}
+
+.workflowStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.workflowItem {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.workflowItem.done {
+  background: #e3f7ee;
+  border-color: #bfe6d4;
+  color: #0d6b4e;
+}
+
+.workflowItem.pending {
+  background: #edf4f9;
+  border-color: #d1e2ee;
+  color: #4b6475;
 }
 
 .card h2,
@@ -564,5 +613,20 @@ button:disabled {
 
   .chartGrid {
     grid-template-columns: 1fr;
+  }
+
+  .stepper {
+    gap: 6px;
+  }
+
+  .stepChip {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  .stepChip span {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
   }
 }

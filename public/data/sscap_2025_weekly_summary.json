@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-04-03T10:46:02.235Z",
+  "year": 2025,
+  "schoolCount": 6,
+  "weeklyRecords": 318,
+  "apiPayloads": 954,
+  "totalsBySchool": [
+    {
+      "schoolId": "15DPR0594Z",
+      "schoolName": "PRIMARIA BENITO JUAREZ",
+      "capturedM3": 190.38,
+      "utilizedM3": 108.26,
+      "maxLevelMeters": 2.02
+    },
+    {
+      "schoolId": "15ETV0293A",
+      "schoolName": "SECUNDARIA OFTV NO.0194 GRAL EMILIANO ZAPATA",
+      "capturedM3": 142.73,
+      "utilizedM3": 131.12,
+      "maxLevelMeters": 2.08
+    },
+    {
+      "schoolId": "15EBH0466T",
+      "schoolName": "PREPARATORIA OFICIAL NO 271",
+      "capturedM3": 268.48,
+      "utilizedM3": 103.39,
+      "maxLevelMeters": 1.94
+    },
+    {
+      "schoolId": "15DPR0454Z",
+      "schoolName": "PRIMARIA VICENTE GUERRERO",
+      "capturedM3": 130.07,
+      "utilizedM3": 101.14,
+      "maxLevelMeters": 2.06
+    },
+    {
+      "schoolId": "15DTV0170S",
+      "schoolName": "TELESECUNDARIA IGNACIO ALLENDE",
+      "capturedM3": 118.42,
+      "utilizedM3": 108.68,
+      "maxLevelMeters": 2.03
+    },
+    {
+      "schoolId": "15EJN3378M",
+      "schoolName": "PREESCOLAR RICARDO FLORES MAGON",
+      "capturedM3": 198.96,
+      "utilizedM3": 134.66,
+      "maxLevelMeters": 2.05
+    }
+  ]
+}
