@@ -104,6 +104,8 @@ a {
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: 8px;
   margin-bottom: 8px;
 }
@@ -114,6 +116,7 @@ a {
   color: var(--ink);
   border-radius: 999px;
   white-space: nowrap;
+  flex: 0 0 auto;
   font-size: 13px;
   padding: 8px 12px;
   display: inline-flex;
@@ -601,6 +604,11 @@ button:disabled {
   button,
   textarea {
     width: 100%;
+  }
+
+  .stepper .stepChip {
+    width: auto;
+    min-width: max-content;
   }
 
   .row {

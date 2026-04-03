@@ -363,10 +363,14 @@ export default function Page() {
   async function processCertificationUpload(file) {
     const text = await file.text();
     const parsed = JSON.parse(text);
+    return processCertificationPayload(parsed, `upload:${file.name}`, file.name);
+  }
+
+  async function processCertificationPayload(payload, sourceName, uploadName = '') {
     const response = await fetch('/api/certification', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ sourceName: `upload:${file.name}`, downloadPayload: parsed })
+      body: JSON.stringify({ sourceName, downloadPayload: payload })
     });
     const data = await response.json();
     if (!response.ok || data?.error) {
@@ -375,7 +379,7 @@ export default function Page() {
     setCertificationData(data);
     setCertificationError('');
     setCertificationSourceMode('upload');
-    setCertificationUploadName(file.name);
+    setCertificationUploadName(uploadName || sourceName || 'uploaded');
   }
 
   useEffect(() => {
@@ -1169,6 +1173,19 @@ export default function Page() {
                   }}
                 />
               </label>
+              <button
+                className="secondary"
+                onClick={async () => {
+                  try {
+                    const payload = await fetch('/data/sscap_2025_weekly_api_download.json').then((r) => r.json());
+                    await processCertificationPayload(payload, 'hosted-demo-file', 'sscap_2025_weekly_api_download.json');
+                  } catch (error) {
+                    setCertificationError(error.message || 'Failed to load hosted demo file.');
+                  }
+                }}
+              >
+                Use Hosted Demo File
+              </button>
               <span className="badge info">
                 Active source: {certificationSourceMode === 'api' ? 'API' : `Upload (${certificationUploadName || 'file'})`}
               </span>
