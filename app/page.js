@@ -455,12 +455,21 @@ export default function Page() {
   const basinQuarterAggregates = useMemo(() => certificationData?.aggregates || [], [certificationData]);
   const basinTotals = useMemo(() => certificationData?.basinTotals || [], [certificationData]);
 
+  const certificationBasinOptions = useMemo(() => {
+    const values = new Set();
+    basinTotals.forEach((x) => values.add(String(x.basinId)));
+    basinQuarterAggregates.forEach((x) => values.add(String(x.basinId)));
+    return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b));
+  }, [basinTotals, basinQuarterAggregates]);
+
   const basinOptions = useMemo(() => {
     const values = new Set();
-    basinTotals.forEach((x) => values.add(x.basinId));
-    schools.forEach((s) => values.add(s.basinId));
+    certificationBasinOptions.forEach((b) => values.add(b));
+    if (!values.size) {
+      schools.forEach((s) => values.add(String(s.basinId)));
+    }
     return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b));
-  }, [basinTotals, schools]);
+  }, [certificationBasinOptions, schools]);
 
   useEffect(() => {
     if (!basinOptions.length) return;
@@ -468,6 +477,14 @@ export default function Page() {
       setSelectedBasinId(String(basinOptions[0]));
     }
   }, [basinOptions, selectedBasinId]);
+
+  useEffect(() => {
+    // If certification data is loaded, prefer a basin that actually exists in certification aggregates.
+    if (!certificationBasinOptions.length) return;
+    if (!certificationBasinOptions.some((b) => String(b) === String(selectedBasinId))) {
+      setSelectedBasinId(certificationBasinOptions[0]);
+    }
+  }, [certificationBasinOptions, selectedBasinId]);
 
   const selectedAggregate = useMemo(
     () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
