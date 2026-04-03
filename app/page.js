@@ -462,6 +462,13 @@ export default function Page() {
     return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b));
   }, [basinTotals, schools]);
 
+  useEffect(() => {
+    if (!basinOptions.length) return;
+    if (!selectedBasinId || !basinOptions.some((b) => String(b) === String(selectedBasinId))) {
+      setSelectedBasinId(String(basinOptions[0]));
+    }
+  }, [basinOptions, selectedBasinId]);
+
   const selectedAggregate = useMemo(
     () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
     [basinQuarterAggregates, selectedBasinId, selectedQuarter]
