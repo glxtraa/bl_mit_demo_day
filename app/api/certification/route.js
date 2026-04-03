@@ -78,8 +78,48 @@ function normalizeGenericRecord(record) {
 
 function extractAndNormalizeRecords(input) {
   if (!input) return [];
-  if (Array.isArray(input)) return input.map(normalizeGenericRecord).filter(Boolean);
-  if (Array.isArray(input?.records)) return input.records.map(normalizeGenericRecord).filter(Boolean);
+  if (Array.isArray(input)) {
+    const normalized = input.map(normalizeGenericRecord).filter(Boolean);
+    if (normalized.length) return normalized;
+
+    // Support weekly simulation payload rows where each row carries captado/utilizado/nivel objects.
+    const expanded = [];
+    for (const row of input) {
+      if (!row?.captado?.tlaloque_id || !row?.utilizado?.tlaloque_id || !row?.nivel?.tlaloque_id) continue;
+      expanded.push(
+        normalizeGenericRecord({
+          type: 'captado',
+          deviceId: row.captado.tlaloque_id,
+          pulses: row.captado.pulses,
+          timestamp: row.captado.catched_at,
+          createdAt: row.captado.catched_at,
+          source: 'uploaded-weekly-payload'
+        }),
+        normalizeGenericRecord({
+          type: 'utilizado',
+          deviceId: row.utilizado.tlaloque_id,
+          pulses: row.utilizado.pulses,
+          timestamp: row.utilizado.used_at,
+          createdAt: row.utilizado.used_at,
+          source: 'uploaded-weekly-payload'
+        }),
+        normalizeGenericRecord({
+          type: 'nivel',
+          deviceId: row.nivel.tlaloque_id,
+          meters: row.nivel.meters,
+          timestamp: row.nivel.catched_at,
+          createdAt: row.nivel.catched_at,
+          source: 'uploaded-weekly-payload'
+        })
+      );
+    }
+    return expanded.filter(Boolean);
+  }
+  if (Array.isArray(input?.records)) {
+    const direct = input.records.map(normalizeGenericRecord).filter(Boolean);
+    if (direct.length) return direct;
+    return extractAndNormalizeRecords(input.records);
+  }
   if (Array.isArray(input?.data)) return input.data.map(normalizeLegacyRecord).filter(Boolean);
   if (input?.downloadPayload) return extractAndNormalizeRecords(input.downloadPayload);
   return [];
@@ -124,7 +164,7 @@ function pointInPolygon(lon, lat, geometry) {
 }
 
 function basinIdFromFeature(feature, fallback = 'UNIDENTIFIED') {
-  return (
+  return String(
     feature?.properties?.BASIN_ID ||
     feature?.properties?.PFAF_ID ||
     feature?.properties?.HYBAS_ID ||
@@ -211,7 +251,7 @@ function buildCertificationResult(normalized, schools, basins, sources) {
       schoolIds: [...row.schools],
       deviceIds: [...row.devices]
     }))
-    .sort((a, b) => a.basinId.localeCompare(b.basinId) || a.quarter.localeCompare(b.quarter));
+    .sort((a, b) => String(a.basinId).localeCompare(String(b.basinId)) || String(a.quarter).localeCompare(String(b.quarter)));
 
   const basinTotalsMap = new Map();
   for (const row of aggregates) {
@@ -229,7 +269,7 @@ function buildCertificationResult(normalized, schools, basins, sources) {
       usedM3: Number(t.usedM3.toFixed(2)),
       eligibleM3: Number(t.eligibleM3.toFixed(2))
     }))
-    .sort((a, b) => b.usedM3 - a.usedM3);
+    .sort((a, b) => b.usedM3 - a.usedM3 || String(a.basinId).localeCompare(String(b.basinId)));
 
   return {
     generatedAt: new Date().toISOString(),
