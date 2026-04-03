@@ -169,6 +169,36 @@ function StatusPill({ tone, icon, label }) {
   );
 }
 
+function MiniBarChart({ title, data, labelKey, valueKey, unit }) {
+  const max = Math.max(1, ...data.map((x) => Number(x?.[valueKey] || 0)));
+  return (
+    <div className="chartCard">
+      <h4>{title}</h4>
+      {data.length === 0 ? (
+        <p className="subtitle">No data</p>
+      ) : (
+        <div className="bars">
+          {data.map((row) => {
+            const value = Number(row?.[valueKey] || 0);
+            const width = Math.max(4, Math.round((value / max) * 100));
+            return (
+              <div className="barRow" key={`${row?.[labelKey]}-${value}`}>
+                <div className="barLabel">{row?.[labelKey]}</div>
+                <div className="barTrack">
+                  <div className="barFill" style={{ width: `${width}%` }} />
+                </div>
+                <div className="barValue">
+                  {fmt(value)} {unit}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function KpiIcon({ icon }) {
   const common = {
     className: 'kpiSvg',
@@ -250,6 +280,8 @@ export default function Page() {
   });
   const [simBusy, setSimBusy] = useState(false);
   const [apiDownload, setApiDownload] = useState(null);
+  const [certificationData, setCertificationData] = useState(null);
+  const [certificationError, setCertificationError] = useState('');
   const [rainSeasonality, setRainSeasonality] = useState({ source: null, schools: {} });
   const [rainLoadError, setRainLoadError] = useState('');
   const [selectedQuarter, setSelectedQuarter] = useState(quarterFromDate());
@@ -263,11 +295,12 @@ export default function Page() {
 
   useEffect(() => {
     async function load() {
-      const [schoolsData, projectsData, downloadData, rainResponse] = await Promise.all([
+      const [schoolsData, projectsData, downloadData, rainResponse, certResponse] = await Promise.all([
         fetch('/data/schools.cleaned.json').then((r) => r.json()),
         fetch('/data/projects.seed.json').then((r) => r.json()),
         fetch('/api/download').then((r) => r.json()),
-        fetch('/data/rain_seasonality.json').catch(() => null)
+        fetch('/data/rain_seasonality.json').catch(() => null),
+        fetch('/api/certification').catch(() => null)
       ]);
 
       let basinsData = { type: 'FeatureCollection', features: [] };
@@ -289,6 +322,11 @@ export default function Page() {
       setSelectedProjectId(projectsData[0]?.projectId || '');
       setSelectedBasinId(projectsData[0]?.location?.basinId || schoolsData[0]?.basinId || '');
       setApiDownload(downloadData);
+      if (certResponse?.ok) {
+        setCertificationData(await certResponse.json());
+      } else {
+        setCertificationError('Failed to load certification aggregation pipeline.');
+      }
       if (rainResponse?.ok) {
         setRainSeasonality(await rainResponse.json());
       } else {
@@ -330,59 +368,15 @@ export default function Page() {
     [rainSeasonality, selectedSchool]
   );
 
-  const basinQuarterAggregates = useMemo(() => {
-    const byKey = new Map();
-    const records = apiDownload?.records || [];
-
-    for (const record of records) {
-      if (record?.type !== 'utilizado') continue;
-      const deviceId = record?.data?.tlaloque_id;
-      const pulses = Number(record?.data?.pulses);
-      if (!deviceId || !Number.isFinite(pulses)) continue;
-
-      const school = schools.find((s) => s.meter?.deviceId === deviceId);
-      const basinId = school?.basinId || projects.find((p) => (p.linkedDeviceIds || []).includes(deviceId))?.location?.basinId || 'UNIDENTIFIED';
-      const sourceDate = record?.data?.used_at || record?.createdAt;
-      const quarter = quarterFromDate(sourceDate);
-      const key = `${basinId}::${quarter}`;
-      const usedM3 = Math.max(0, pulses / 100);
-
-      if (!byKey.has(key)) {
-        byKey.set(key, {
-          key,
-          basinId,
-          quarter,
-          usedM3: 0,
-          eligibleM3: 0,
-          recordCount: 0,
-          schoolIds: new Set(),
-          deviceIds: new Set()
-        });
-      }
-      const agg = byKey.get(key);
-      agg.usedM3 += usedM3;
-      agg.recordCount += 1;
-      if (school?.schoolId) agg.schoolIds.add(school.schoolId);
-      agg.deviceIds.add(deviceId);
-    }
-
-    return [...byKey.values()]
-      .map((agg) => ({
-        ...agg,
-        usedM3: Number(agg.usedM3.toFixed(2)),
-        eligibleM3: Number((agg.usedM3 * 0.85).toFixed(2)),
-        schoolIds: [...agg.schoolIds],
-        deviceIds: [...agg.deviceIds]
-      }))
-      .sort((a, b) => a.basinId.localeCompare(b.basinId) || a.quarter.localeCompare(b.quarter));
-  }, [apiDownload, projects, schools]);
+  const basinQuarterAggregates = useMemo(() => certificationData?.aggregates || [], [certificationData]);
+  const basinTotals = useMemo(() => certificationData?.basinTotals || [], [certificationData]);
 
   const basinOptions = useMemo(() => {
     const values = new Set();
-    basinQuarterAggregates.forEach((x) => values.add(x.basinId));
+    basinTotals.forEach((x) => values.add(x.basinId));
     schools.forEach((s) => values.add(s.basinId));
     return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b));
-  }, [basinQuarterAggregates, schools]);
+  }, [basinTotals, schools]);
 
   const selectedAggregate = useMemo(
     () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
@@ -619,6 +613,13 @@ export default function Page() {
       }
       const latestDownload = await fetch('/api/download').then((r) => r.json());
       setApiDownload(latestDownload);
+      const latestCertification = await fetch('/api/certification').then((r) => r.json());
+      if (!latestCertification?.error) {
+        setCertificationData(latestCertification);
+        setCertificationError('');
+      } else {
+        setCertificationError(latestCertification.error);
+      }
     } finally {
       setSimBusy(false);
     }
@@ -981,6 +982,36 @@ export default function Page() {
         <section className="wizardScreen">
           <div className="card">
             <h2>4) Certification Review Workspace</h2>
+            <h3>SSCAP Pipeline (Colab-aligned)</h3>
+            <p>
+              1) Read SSCAP API data 2) Remove duplicates 3) Map <code>tlaloque_id</code> to basin from school latitude/longitude
+              4) Aggregate by basin + quarter 5) Human review.
+            </p>
+            <div className="row">
+              <span className="badge info">Fetched: {certificationData?.pipeline?.fetched || 0}</span>
+              <span className="badge warn">Duplicates removed: {certificationData?.pipeline?.duplicatesRemoved || 0}</span>
+              <span className="badge info">Deduped: {certificationData?.pipeline?.deduplicated || 0}</span>
+              <span className="badge info">Mapped to basins: {certificationData?.pipeline?.mappedToBasins || 0}</span>
+            </div>
+            {certificationData?.sources?.length ? (
+              <p>
+                Sources:{' '}
+                {certificationData.sources
+                  .map((s) => `${s.name} (${s.fetched}${s.error ? `, ${s.error}` : ''})`)
+                  .join(' · ')}
+              </p>
+            ) : null}
+            {certificationError ? <div className="code">{certificationError}</div> : null}
+            <div className="chartGrid">
+              <MiniBarChart title="Basin Totals (Used m³)" data={basinTotals} labelKey="basinId" valueKey="usedM3" unit="m³" />
+              <MiniBarChart
+                title={`Quarterly Used m³ (${selectedBasinId || 'No Basin'})`}
+                data={basinQuarterAggregates.filter((x) => x.basinId === selectedBasinId)}
+                labelKey="quarter"
+                valueKey="usedM3"
+                unit="m³"
+              />
+            </div>
             <p>
               AI recommendation: <strong>{aiForSelected?.recommendation || 'N/A'}</strong> · confidence {fmt((aiForSelected?.confidence || 0) * 100)}%
             </p>
@@ -1028,8 +1059,8 @@ export default function Page() {
               <div className="row">
                 <span className="badge info">Measured: {fmt(selectedAggregate.usedM3)} m³</span>
                 <span className="badge good">Eligible: {fmt(selectedAggregate.eligibleM3)} m³</span>
-                <span className="badge info">Records: {selectedAggregate.recordCount}</span>
-                <span className="badge info">Schools: {selectedAggregate.schoolIds.length}</span>
+                <span className="badge info">Records: {selectedAggregate.records || 0}</span>
+                <span className="badge info">Schools: {selectedAggregate.schoolIds?.length || 0}</span>
               </div>
             ) : (
               <p>No ingested `utilizado` records available for this basin/quarter yet.</p>
