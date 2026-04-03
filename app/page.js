@@ -282,6 +282,8 @@ export default function Page() {
   const [apiDownload, setApiDownload] = useState(null);
   const [certificationData, setCertificationData] = useState(null);
   const [certificationError, setCertificationError] = useState('');
+  const [certificationSourceMode, setCertificationSourceMode] = useState('api');
+  const [certificationUploadName, setCertificationUploadName] = useState('');
   const [rainSeasonality, setRainSeasonality] = useState({ source: null, schools: {} });
   const [rainLoadError, setRainLoadError] = useState('');
   const [selectedQuarter, setSelectedQuarter] = useState(quarterFromDate());
@@ -293,14 +295,43 @@ export default function Page() {
 
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
 
+  async function loadCertificationFromApi() {
+    const response = await fetch('/api/certification');
+    const data = await response.json();
+    if (!response.ok || data?.error) {
+      throw new Error(data?.error || 'Failed to load certification aggregation pipeline.');
+    }
+    setCertificationData(data);
+    setCertificationError('');
+    setCertificationSourceMode('api');
+    setCertificationUploadName('');
+  }
+
+  async function processCertificationUpload(file) {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    const response = await fetch('/api/certification', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sourceName: `upload:${file.name}`, downloadPayload: parsed })
+    });
+    const data = await response.json();
+    if (!response.ok || data?.error) {
+      throw new Error(data?.error || 'Uploaded JSON could not be processed.');
+    }
+    setCertificationData(data);
+    setCertificationError('');
+    setCertificationSourceMode('upload');
+    setCertificationUploadName(file.name);
+  }
+
   useEffect(() => {
     async function load() {
-      const [schoolsData, projectsData, downloadData, rainResponse, certResponse] = await Promise.all([
+      const [schoolsData, projectsData, downloadData, rainResponse] = await Promise.all([
         fetch('/data/schools.cleaned.json').then((r) => r.json()),
         fetch('/data/projects.seed.json').then((r) => r.json()),
         fetch('/api/download').then((r) => r.json()),
-        fetch('/data/rain_seasonality.json').catch(() => null),
-        fetch('/api/certification').catch(() => null)
+        fetch('/data/rain_seasonality.json').catch(() => null)
       ]);
 
       let basinsData = { type: 'FeatureCollection', features: [] };
@@ -322,10 +353,10 @@ export default function Page() {
       setSelectedProjectId(projectsData[0]?.projectId || '');
       setSelectedBasinId(projectsData[0]?.location?.basinId || schoolsData[0]?.basinId || '');
       setApiDownload(downloadData);
-      if (certResponse?.ok) {
-        setCertificationData(await certResponse.json());
-      } else {
-        setCertificationError('Failed to load certification aggregation pipeline.');
+      try {
+        await loadCertificationFromApi();
+      } catch (error) {
+        setCertificationError(error.message || 'Failed to load certification aggregation pipeline.');
       }
       if (rainResponse?.ok) {
         setRainSeasonality(await rainResponse.json());
@@ -613,12 +644,12 @@ export default function Page() {
       }
       const latestDownload = await fetch('/api/download').then((r) => r.json());
       setApiDownload(latestDownload);
-      const latestCertification = await fetch('/api/certification').then((r) => r.json());
-      if (!latestCertification?.error) {
-        setCertificationData(latestCertification);
-        setCertificationError('');
-      } else {
-        setCertificationError(latestCertification.error);
+      if (certificationSourceMode === 'api') {
+        try {
+          await loadCertificationFromApi();
+        } catch (error) {
+          setCertificationError(error.message || 'Failed to refresh certification from API.');
+        }
       }
     } finally {
       setSimBusy(false);
@@ -982,6 +1013,43 @@ export default function Page() {
         <section className="wizardScreen">
           <div className="card">
             <h2>4) Certification Review Workspace</h2>
+            <h3>VWBO Data Source</h3>
+            <p>Choose whether VWBO certification uses live API data or an uploaded `/api/download`-format JSON file.</p>
+            <div className="row">
+              <button
+                className={certificationSourceMode === 'api' ? '' : 'secondary'}
+                onClick={async () => {
+                  try {
+                    await loadCertificationFromApi();
+                  } catch (error) {
+                    setCertificationError(error.message || 'Failed to load API data source.');
+                  }
+                }}
+              >
+                Use API Source
+              </button>
+              <label className="uploadLabel">
+                Upload Download JSON
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      await processCertificationUpload(file);
+                    } catch (error) {
+                      setCertificationError(error.message || 'Uploaded JSON could not be processed.');
+                    } finally {
+                      e.target.value = '';
+                    }
+                  }}
+                />
+              </label>
+              <span className="badge info">
+                Active source: {certificationSourceMode === 'api' ? 'API' : `Upload (${certificationUploadName || 'file'})`}
+              </span>
+            </div>
             <h3>SSCAP Pipeline (Colab-aligned)</h3>
             <p>
               1) Read SSCAP API data 2) Remove duplicates 3) Map <code>tlaloque_id</code> to basin from school latitude/longitude

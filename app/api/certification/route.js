@@ -39,7 +39,7 @@ function normalizeLocalRecord(record) {
     pulses: Number.isFinite(Number(data?.pulses)) ? Number(data.pulses) : null,
     meters: Number.isFinite(Number(data?.meters)) ? Number(data.meters) : null,
     createdAt: toIso(record?.createdAt),
-    source: 'local-store'
+    source: record?.source || 'local-store'
   };
 }
 
@@ -54,8 +54,35 @@ function normalizeLegacyRecord(record) {
     pulses: Number.isFinite(Number(data?.pulses)) ? Number(data.pulses) : null,
     meters: Number.isFinite(Number(data?.meters)) ? Number(data.meters) : null,
     createdAt: toIso(content?.created_at || record?.uploadedAt),
-    source: 'sscap-api'
+    source: record?.source || 'sscap-api'
   };
+}
+
+function normalizeGenericRecord(record) {
+  if (record?.data && record?.type) return normalizeLocalRecord(record);
+  if (record?.content && record?.filename) return normalizeLegacyRecord(record);
+  if (record?.deviceId && record?.type) {
+    return {
+      id: record?.id || crypto.randomUUID(),
+      type: record.type,
+      deviceId: record.deviceId,
+      timestamp: toIso(record.timestamp),
+      pulses: Number.isFinite(Number(record?.pulses)) ? Number(record.pulses) : null,
+      meters: Number.isFinite(Number(record?.meters)) ? Number(record.meters) : null,
+      createdAt: toIso(record.createdAt || record.timestamp),
+      source: record?.source || 'uploaded-file'
+    };
+  }
+  return null;
+}
+
+function extractAndNormalizeRecords(input) {
+  if (!input) return [];
+  if (Array.isArray(input)) return input.map(normalizeGenericRecord).filter(Boolean);
+  if (Array.isArray(input?.records)) return input.records.map(normalizeGenericRecord).filter(Boolean);
+  if (Array.isArray(input?.data)) return input.data.map(normalizeLegacyRecord).filter(Boolean);
+  if (input?.downloadPayload) return extractAndNormalizeRecords(input.downloadPayload);
+  return [];
 }
 
 function pointInRing(lon, lat, ring = []) {
@@ -106,14 +133,126 @@ function basinIdFromFeature(feature, fallback = 'UNIDENTIFIED') {
   );
 }
 
+function loadMaps() {
+  const schools = fs.existsSync(schoolsPath) ? JSON.parse(fs.readFileSync(schoolsPath, 'utf8')) : [];
+  const basins = fs.existsSync(basinsPath) ? JSON.parse(fs.readFileSync(basinsPath, 'utf8')) : { features: [] };
+  return { schools, basins };
+}
+
+function buildCertificationResult(normalized, schools, basins, sources) {
+  const deduped = [];
+  const seen = new Set();
+  const sorted = normalized
+    .filter((r) => r.deviceId && r.timestamp && r.type !== 'unknown')
+    .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  for (const r of sorted) {
+    const key = [r.type, r.deviceId, r.timestamp, r.pulses ?? '', r.meters ?? ''].join('|');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(r);
+  }
+
+  const schoolByDevice = new Map(
+    schools
+      .filter((s) => s?.meter?.deviceId)
+      .map((s) => [s.meter.deviceId, { schoolId: s.schoolId, schoolName: s.schoolName, lat: s.lat, lon: s.lon, fallbackBasinId: s.basinId }])
+  );
+
+  const enriched = deduped.map((r) => {
+    const school = schoolByDevice.get(r.deviceId) || null;
+    const lat = school?.lat;
+    const lon = school?.lon;
+    let basinId = school?.fallbackBasinId || 'UNIDENTIFIED';
+    if (typeof lat === 'number' && typeof lon === 'number') {
+      const match = (basins?.features || []).find((f) => pointInPolygon(lon, lat, f?.geometry));
+      if (match) basinId = basinIdFromFeature(match, basinId);
+    }
+    return {
+      ...r,
+      schoolId: school?.schoolId || null,
+      schoolName: school?.schoolName || null,
+      lat: typeof lat === 'number' ? lat : null,
+      lon: typeof lon === 'number' ? lon : null,
+      basinId
+    };
+  });
+
+  const aggMap = new Map();
+  for (const r of enriched) {
+    if (r.type !== 'utilizado' || !Number.isFinite(r.pulses)) continue;
+    const quarter = quarterFromDate(r.timestamp);
+    const key = `${r.basinId}::${quarter}`;
+    const usedM3 = Math.max(0, Number((r.pulses / 100).toFixed(3)));
+    if (!aggMap.has(key)) {
+      aggMap.set(key, {
+        basinId: r.basinId,
+        quarter,
+        usedM3: 0,
+        eligibleM3: 0,
+        records: 0,
+        schools: new Set(),
+        devices: new Set()
+      });
+    }
+    const row = aggMap.get(key);
+    row.usedM3 += usedM3;
+    row.records += 1;
+    if (r.schoolId) row.schools.add(r.schoolId);
+    row.devices.add(r.deviceId);
+  }
+
+  const aggregates = [...aggMap.values()]
+    .map((row) => ({
+      basinId: row.basinId,
+      quarter: row.quarter,
+      usedM3: Number(row.usedM3.toFixed(2)),
+      eligibleM3: Number((row.usedM3 * 0.85).toFixed(2)),
+      records: row.records,
+      schoolIds: [...row.schools],
+      deviceIds: [...row.devices]
+    }))
+    .sort((a, b) => a.basinId.localeCompare(b.basinId) || a.quarter.localeCompare(b.quarter));
+
+  const basinTotalsMap = new Map();
+  for (const row of aggregates) {
+    if (!basinTotalsMap.has(row.basinId)) {
+      basinTotalsMap.set(row.basinId, { basinId: row.basinId, usedM3: 0, eligibleM3: 0, records: 0 });
+    }
+    const t = basinTotalsMap.get(row.basinId);
+    t.usedM3 += row.usedM3;
+    t.eligibleM3 += row.eligibleM3;
+    t.records += row.records;
+  }
+  const basinTotals = [...basinTotalsMap.values()]
+    .map((t) => ({
+      ...t,
+      usedM3: Number(t.usedM3.toFixed(2)),
+      eligibleM3: Number(t.eligibleM3.toFixed(2))
+    }))
+    .sort((a, b) => b.usedM3 - a.usedM3);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    pipeline: {
+      fetched: normalized.length,
+      deduplicated: deduped.length,
+      duplicatesRemoved: normalized.length - deduped.length,
+      mappedToSchools: enriched.filter((r) => r.schoolId).length,
+      mappedToBasins: enriched.filter((r) => r.basinId && r.basinId !== 'UNIDENTIFIED').length
+    },
+    sources,
+    records: enriched,
+    aggregates,
+    basinTotals
+  };
+}
+
 export async function GET() {
   try {
-    const schools = fs.existsSync(schoolsPath) ? JSON.parse(fs.readFileSync(schoolsPath, 'utf8')) : [];
-    const basins = fs.existsSync(basinsPath) ? JSON.parse(fs.readFileSync(basinsPath, 'utf8')) : { features: [] };
-    const localRecords = listSensorRecords().map(normalizeLocalRecord);
-
-    const sources = [{ name: 'local-store', fetched: localRecords.length }];
-    const all = [...localRecords];
+    const { schools, basins } = loadMaps();
+    const local = listSensorRecords().map((r) => normalizeLocalRecord({ ...r, source: 'local-store' }));
+    const all = [...local];
+    const sources = [{ name: 'local-store', fetched: local.length }];
 
     if (process.env.SSCAP_API_BASE_URL) {
       try {
@@ -124,13 +263,12 @@ export async function GET() {
         });
         if (res.ok) {
           const json = await res.json();
-          const remoteList = Array.isArray(json?.records)
-            ? json.records.map(normalizeLocalRecord)
-            : Array.isArray(json?.data)
-              ? json.data.map(normalizeLegacyRecord)
-              : [];
-          all.push(...remoteList);
-          sources.push({ name: 'sscap-api', fetched: remoteList.length, endpoint: `${base}/api/download` });
+          const remote = extractAndNormalizeRecords({
+            records: Array.isArray(json?.records) ? json.records : undefined,
+            data: Array.isArray(json?.data) ? json.data : undefined
+          }).map((r) => ({ ...r, source: 'sscap-api' }));
+          all.push(...remote);
+          sources.push({ name: 'sscap-api', fetched: remote.length, endpoint: `${base}/api/download` });
         } else {
           sources.push({ name: 'sscap-api', fetched: 0, error: `HTTP ${res.status}` });
         }
@@ -139,114 +277,23 @@ export async function GET() {
       }
     }
 
-    const deduped = [];
-    const seen = new Set();
-    const sorted = all
-      .filter((r) => r.deviceId && r.timestamp && r.type !== 'unknown')
-      .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
-    for (const r of sorted) {
-      const key = [r.type, r.deviceId, r.timestamp, r.pulses ?? '', r.meters ?? ''].join('|');
-      if (seen.has(key)) continue;
-      seen.add(key);
-      deduped.push(r);
-    }
-
-    const schoolByDevice = new Map(
-      schools
-        .filter((s) => s?.meter?.deviceId)
-        .map((s) => [s.meter.deviceId, { schoolId: s.schoolId, schoolName: s.schoolName, lat: s.lat, lon: s.lon, fallbackBasinId: s.basinId }])
-    );
-
-    const enriched = deduped.map((r) => {
-      const school = schoolByDevice.get(r.deviceId) || null;
-      const lat = school?.lat;
-      const lon = school?.lon;
-      let basinId = school?.fallbackBasinId || 'UNIDENTIFIED';
-      if (typeof lat === 'number' && typeof lon === 'number') {
-        const match = (basins?.features || []).find((f) => pointInPolygon(lon, lat, f?.geometry));
-        if (match) {
-          basinId = basinIdFromFeature(match, basinId);
-        }
-      }
-      return {
-        ...r,
-        schoolId: school?.schoolId || null,
-        schoolName: school?.schoolName || null,
-        lat: typeof lat === 'number' ? lat : null,
-        lon: typeof lon === 'number' ? lon : null,
-        basinId
-      };
-    });
-
-    const aggMap = new Map();
-    for (const r of enriched) {
-      if (r.type !== 'utilizado' || !Number.isFinite(r.pulses)) continue;
-      const quarter = quarterFromDate(r.timestamp);
-      const key = `${r.basinId}::${quarter}`;
-      const usedM3 = Math.max(0, Number((r.pulses / 100).toFixed(3)));
-      if (!aggMap.has(key)) {
-        aggMap.set(key, {
-          basinId: r.basinId,
-          quarter,
-          usedM3: 0,
-          eligibleM3: 0,
-          records: 0,
-          schools: new Set(),
-          devices: new Set()
-        });
-      }
-      const row = aggMap.get(key);
-      row.usedM3 += usedM3;
-      row.records += 1;
-      if (r.schoolId) row.schools.add(r.schoolId);
-      row.devices.add(r.deviceId);
-    }
-
-    const aggregates = [...aggMap.values()]
-      .map((row) => ({
-        basinId: row.basinId,
-        quarter: row.quarter,
-        usedM3: Number(row.usedM3.toFixed(2)),
-        eligibleM3: Number((row.usedM3 * 0.85).toFixed(2)),
-        records: row.records,
-        schoolIds: [...row.schools],
-        deviceIds: [...row.devices]
-      }))
-      .sort((a, b) => a.basinId.localeCompare(b.basinId) || a.quarter.localeCompare(b.quarter));
-
-    const basinTotalsMap = new Map();
-    for (const row of aggregates) {
-      if (!basinTotalsMap.has(row.basinId)) {
-        basinTotalsMap.set(row.basinId, { basinId: row.basinId, usedM3: 0, eligibleM3: 0, records: 0 });
-      }
-      const t = basinTotalsMap.get(row.basinId);
-      t.usedM3 += row.usedM3;
-      t.eligibleM3 += row.eligibleM3;
-      t.records += row.records;
-    }
-    const basinTotals = [...basinTotalsMap.values()]
-      .map((t) => ({
-        ...t,
-        usedM3: Number(t.usedM3.toFixed(2)),
-        eligibleM3: Number(t.eligibleM3.toFixed(2))
-      }))
-      .sort((a, b) => b.usedM3 - a.usedM3);
-
-    return NextResponse.json({
-      generatedAt: new Date().toISOString(),
-      pipeline: {
-        fetched: all.length,
-        deduplicated: deduped.length,
-        duplicatesRemoved: all.length - deduped.length,
-        mappedToSchools: enriched.filter((r) => r.schoolId).length,
-        mappedToBasins: enriched.filter((r) => r.basinId && r.basinId !== 'UNIDENTIFIED').length
-      },
-      sources,
-      records: enriched,
-      aggregates,
-      basinTotals
-    });
+    return NextResponse.json(buildCertificationResult(all, schools, basins, sources));
   } catch (error) {
     return NextResponse.json({ error: error?.message || 'Failed to build certification dataset' }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const sourceName = body?.sourceName || 'uploaded-file';
+    const normalized = extractAndNormalizeRecords(body?.downloadPayload || body);
+    if (!normalized.length) {
+      return NextResponse.json({ error: 'No usable records found in uploaded JSON.' }, { status: 400 });
+    }
+    const { schools, basins } = loadMaps();
+    return NextResponse.json(buildCertificationResult(normalized, schools, basins, [{ name: sourceName, fetched: normalized.length }]));
+  } catch (error) {
+    return NextResponse.json({ error: error?.message || 'Failed to process uploaded certification JSON' }, { status: 400 });
   }
 }

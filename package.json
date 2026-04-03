@@ -9,6 +9,8 @@
     "lint": "next lint",
     "prepare:data": "node scripts/build-school-assets.mjs",
     "fetch:rain": "node scripts/fetch-rain-seasonality.mjs",
+    "simulate:2025": "node scripts/simulate-2025-weekly.mjs",
+    "simulate:2025:send": "node scripts/simulate-2025-weekly.mjs --send",
     "fetch:hydrobasins": "node scripts/fetch-hydrobasins.mjs",
     "extract:basins": "node scripts/extract-hydrobasins.mjs"
   },
