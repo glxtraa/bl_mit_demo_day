@@ -337,6 +337,7 @@ export default function Page() {
   const [certificationError, setCertificationError] = useState('');
   const [certificationSourceMode, setCertificationSourceMode] = useState('api');
   const [certificationUploadName, setCertificationUploadName] = useState('');
+  const [chartBasins, setChartBasins] = useState([]);
   const [rainSeasonality, setRainSeasonality] = useState({ source: null, schools: {} });
   const [rainLoadError, setRainLoadError] = useState('');
   const [selectedQuarter, setSelectedQuarter] = useState(quarterFromDate());
@@ -490,26 +491,53 @@ export default function Page() {
     }
   }, [certificationBasinOptions, selectedBasinId]);
 
+  useEffect(() => {
+    if (!certificationBasinOptions.length) {
+      setChartBasins([]);
+      return;
+    }
+    setChartBasins((prev) => {
+      const validPrev = prev.filter((b) => certificationBasinOptions.includes(String(b)));
+      if (validPrev.length) return validPrev;
+      return [...certificationBasinOptions];
+    });
+  }, [certificationBasinOptions]);
+
   const selectedAggregate = useMemo(
     () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
     [basinQuarterAggregates, selectedBasinId, selectedQuarter]
   );
-  const selectedBasinCapturedSeries = useMemo(() => {
+  const basinCapturedSeriesMap = useMemo(() => {
     const recs = certificationData?.records || [];
-    const grouped = new Map();
+    const map = new Map();
     for (const r of recs) {
-      if (String(r?.basinId) !== String(selectedBasinId)) continue;
-      if (r?.type !== 'captado') continue;
-      if (!Number.isFinite(r?.pulses)) continue;
+      const basin = String(r?.basinId || '');
+      if (!basin || r?.type !== 'captado' || !Number.isFinite(r?.pulses)) continue;
       const wk = weekStartIso(r.timestamp || r.createdAt);
       if (!wk) continue;
-      if (!grouped.has(wk)) grouped.set(wk, 0);
-      grouped.set(wk, grouped.get(wk) + r.pulses / 100);
+      if (!map.has(basin)) map.set(basin, new Map());
+      const byWeek = map.get(basin);
+      if (!byWeek.has(wk)) byWeek.set(wk, 0);
+      byWeek.set(wk, byWeek.get(wk) + r.pulses / 100);
     }
-    return [...grouped.entries()]
-      .map(([label, value]) => ({ label, value: Number(value.toFixed(2)) }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [certificationData, selectedBasinId]);
+    const out = {};
+    for (const [basin, byWeek] of map.entries()) {
+      out[basin] = [...byWeek.entries()]
+        .map(([label, value]) => ({ label, value: Number(value.toFixed(2)) }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+    }
+    return out;
+  }, [certificationData]);
+  const selectedChartBasins = useMemo(
+    () => chartBasins.filter((b) => certificationBasinOptions.includes(String(b))),
+    [chartBasins, certificationBasinOptions]
+  );
+  const quarterlyChartData = useMemo(() => {
+    return selectedChartBasins.map((basinId) => ({
+      basinId,
+      points: basinQuarterAggregates.filter((x) => String(x.basinId) === String(basinId))
+    }));
+  }, [selectedChartBasins, basinQuarterAggregates]);
   const selectedAggregateApproval = approvedIssuanceBasis[`${selectedBasinId}::${selectedQuarter}`] || null;
   const currentStepMeta = steps.find((s) => s.id === currentStep) || steps[0];
   const stepProgressPct = Math.round((currentStep / steps.length) * 100);
@@ -1216,20 +1244,77 @@ export default function Page() {
               </p>
             ) : null}
             {certificationError ? <div className="code">{certificationError}</div> : null}
+            <div className="chartSelector">
+              <div className="row">
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    setChartBasins([...certificationBasinOptions]);
+                  }}
+                >
+                  Plot All Basins
+                </button>
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    setChartBasins(selectedBasinId ? [String(selectedBasinId)] : []);
+                  }}
+                >
+                  Plot Selected Basin
+                </button>
+                <button className="secondary" onClick={() => setChartBasins([])}>
+                  Clear Plots
+                </button>
+              </div>
+              <div className="basinMulti">
+                {certificationBasinOptions.map((basinId) => {
+                  const active = selectedChartBasins.includes(String(basinId));
+                  return (
+                    <button
+                      key={basinId}
+                      className={`basinChip ${active ? 'active' : ''}`}
+                      onClick={() =>
+                        setChartBasins((prev) =>
+                          prev.includes(String(basinId))
+                            ? prev.filter((b) => b !== String(basinId))
+                            : [...prev, String(basinId)]
+                        )
+                      }
+                    >
+                      {basinId}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <div className="chartGrid">
               <MiniBarChart title="Basin Totals (Used m³)" data={basinTotals} labelKey="basinId" valueKey="usedM3" unit="m³" />
-              <MiniBarChart
-                title={`Quarterly Used m³ (${selectedBasinId || 'No Basin'})`}
-                data={basinQuarterAggregates.filter((x) => x.basinId === selectedBasinId)}
-                labelKey="quarter"
-                valueKey="usedM3"
-                unit="m³"
-              />
-              <MiniLineChart
-                title={`Captured Water Over Time (${selectedBasinId || 'No Basin'})`}
-                points={selectedBasinCapturedSeries}
-                unit="m³/week"
-              />
+              {quarterlyChartData.length === 0 ? (
+                <MiniBarChart title="Quarterly Used m³" data={[]} labelKey="quarter" valueKey="usedM3" unit="m³" />
+              ) : (
+                quarterlyChartData.map((entry) => (
+                  <MiniBarChart
+                    key={`q-${entry.basinId}`}
+                    title={`Quarterly Used m³ (${entry.basinId})`}
+                    data={entry.points}
+                    labelKey="quarter"
+                    valueKey="usedM3"
+                    unit="m³"
+                  />
+                ))
+              )}
+              {selectedChartBasins.length === 0 ? (
+                <MiniLineChart title="Captured Water Over Time" points={[]} unit="m³/week" />
+              ) : (
+                selectedChartBasins.map((basinId) => (
+                  <MiniLineChart
+                    key={`c-${basinId}`}
+                    title={`Captured Water Over Time (${basinId})`}
+                    points={basinCapturedSeriesMap[basinId] || []}
+                    unit="m³/week"
+                  />
+                ))
+              )}
             </div>
             <p>
               AI recommendation: <strong>{aiForSelected?.recommendation || 'N/A'}</strong> · confidence {fmt((aiForSelected?.confidence || 0) * 100)}%

@@ -466,6 +466,35 @@ button:disabled {
   margin: 10px 0 12px;
 }
 
+.chartSelector {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: #f9fcff;
+}
+
+.basinMulti {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.basinChip {
+  background: #edf4f9;
+  color: #295368;
+  border: 1px solid #cfe0ea;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  width: auto;
+}
+
+.basinChip.active {
+  background: #dff4ff;
+  border-color: #90cbe2;
+  color: #0c5f7f;
+}
+
 .chartCard {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -609,6 +638,12 @@ button:disabled {
   .stepper .stepChip {
     width: auto;
     min-width: max-content;
+  }
+
+  .basinMulti .basinChip {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
   }
 
   .row {
