@@ -43,6 +43,15 @@ function quarterFromDate(dateLike) {
   return 'Q4';
 }
 
+function weekStartIso(dateLike) {
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return null;
+  const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const dow = utc.getUTCDay() || 7;
+  utc.setUTCDate(utc.getUTCDate() - dow + 1);
+  return utc.toISOString().slice(0, 10);
+}
+
 function statusBadge(status) {
   if (status === 'approved') return 'good';
   if (status === 'under_review') return 'warn';
@@ -195,6 +204,50 @@ function MiniBarChart({ title, data, labelKey, valueKey, unit }) {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+function MiniLineChart({ title, points = [], unit = 'm3' }) {
+  if (!points.length) {
+    return (
+      <div className="chartCard chartCardWide">
+        <h4>{title}</h4>
+        <p className="subtitle">No data</p>
+      </div>
+    );
+  }
+
+  const w = 640;
+  const h = 200;
+  const pad = 28;
+  const maxY = Math.max(1, ...points.map((p) => Number(p.value || 0)));
+  const minY = 0;
+  const stepX = points.length > 1 ? (w - pad * 2) / (points.length - 1) : 0;
+  const yToPx = (v) => h - pad - ((v - minY) / (maxY - minY || 1)) * (h - pad * 2);
+
+  const path = points
+    .map((p, i) => {
+      const x = pad + i * stepX;
+      const y = yToPx(Number(p.value || 0));
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(' ');
+
+  return (
+    <div className="chartCard chartCardWide">
+      <h4>{title}</h4>
+      <svg className="lineChart" viewBox={`0 0 ${w} ${h}`} aria-label={title}>
+        <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke="#d4e2ec" strokeWidth="1" />
+        <line x1={pad} y1={pad} x2={pad} y2={h - pad} stroke="#d4e2ec" strokeWidth="1" />
+        <path d={path} fill="none" stroke="#0c9ccb" strokeWidth="2.5" />
+      </svg>
+      <div className="lineLegend">
+        <span>
+          Start: {points[0]?.label} · End: {points[points.length - 1]?.label}
+        </span>
+        <span>Peak: {fmt(maxY)} {unit}</span>
+      </div>
     </div>
   );
 }
@@ -413,6 +466,22 @@ export default function Page() {
     () => basinQuarterAggregates.find((x) => x.basinId === selectedBasinId && x.quarter === selectedQuarter) || null,
     [basinQuarterAggregates, selectedBasinId, selectedQuarter]
   );
+  const selectedBasinCapturedSeries = useMemo(() => {
+    const recs = certificationData?.records || [];
+    const grouped = new Map();
+    for (const r of recs) {
+      if (String(r?.basinId) !== String(selectedBasinId)) continue;
+      if (r?.type !== 'captado') continue;
+      if (!Number.isFinite(r?.pulses)) continue;
+      const wk = weekStartIso(r.timestamp || r.createdAt);
+      if (!wk) continue;
+      if (!grouped.has(wk)) grouped.set(wk, 0);
+      grouped.set(wk, grouped.get(wk) + r.pulses / 100);
+    }
+    return [...grouped.entries()]
+      .map(([label, value]) => ({ label, value: Number(value.toFixed(2)) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [certificationData, selectedBasinId]);
   const selectedAggregateApproval = approvedIssuanceBasis[`${selectedBasinId}::${selectedQuarter}`] || null;
 
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
@@ -1078,6 +1147,11 @@ export default function Page() {
                 labelKey="quarter"
                 valueKey="usedM3"
                 unit="m³"
+              />
+              <MiniLineChart
+                title={`Captured Water Over Time (${selectedBasinId || 'No Basin'})`}
+                points={selectedBasinCapturedSeries}
+                unit="m³/week"
               />
             </div>
             <p>
