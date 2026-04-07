@@ -18,13 +18,12 @@ const PROJECT_TYPES = [
 ];
 
 const steps = [
-  { id: 1, title: 'Project' },
-  { id: 2, title: 'Map + Dossier' },
-  { id: 3, title: 'Ingestion' },
-  { id: 4, title: 'Certification' },
-  { id: 5, title: 'Issuance' },
-  { id: 6, title: 'Buyer + Retirement' },
-  { id: 7, title: 'Certificate + Audit' }
+  { id: 1, title: 'Admin' },
+  { id: 2, title: 'Certification' },
+  { id: 3, title: 'Blockchain' },
+  { id: 4, title: 'Marketplace' },
+  { id: 5, title: 'Customer Account' },
+  { id: 6, title: 'Map' }
 ];
 
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'];
@@ -557,15 +556,14 @@ export default function Page() {
   const stepProgressPct = Math.round((currentStep / steps.length) * 100);
   const workflowStatus = useMemo(
     () => [
-      { label: 'Project', done: projects.length > 0 },
-      { label: 'Map', done: (basins?.features?.length || 0) > 0 && Boolean(selectedSchool) },
-      { label: 'Ingestion', done: (apiDownload?.records?.length || 0) > 0 },
+      { label: 'Admin', done: projects.length > 0 && (apiDownload?.records?.length || 0) > 0 },
       { label: 'Certification', done: Object.keys(approvedIssuanceBasis || {}).length > 0 },
-      { label: 'Issuance', done: issuances.length > 0 },
-      { label: 'Retirement', done: retirements.length > 0 },
-      { label: 'Report', done: Boolean(lastReport) }
+      { label: 'Blockchain', done: issuances.length > 0 },
+      { label: 'Marketplace', done: purchases.length > 0 },
+      { label: 'Customer Account', done: retirements.length > 0 && Boolean(lastReport) },
+      { label: 'Map', done: (basins?.features?.length || 0) > 0 && Boolean(selectedSchool) }
     ],
-    [projects.length, basins, selectedSchool, apiDownload, approvedIssuanceBasis, issuances.length, retirements.length, lastReport]
+    [projects.length, basins, selectedSchool, apiDownload, approvedIssuanceBasis, issuances.length, purchases.length, retirements.length, lastReport]
   );
 
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
@@ -964,10 +962,10 @@ export default function Page() {
     <main className="page">
       <section className="header">
         <div>
-          <h1 className="title">Blue Lifeline Demo Day Console</h1>
+          <h1 className="title">Blue Lifeline MVP Modules Console</h1>
           <p className="subtitle">
-            End-to-end path: project onboarding, meter ingestion, certification approval, VWB issuance, buyer retirement,
-            and report generation. Includes schools dataset, simulated SSCAP measurements, and basin vs school localization.
+            Refactored to 6 MVP modules from the latest spec: Admin, Certification, Blockchain, Marketplace, Customer Account,
+            and Map. Includes school dataset, SSCAP ingestion/replay, issuance, retirement, and audit-ready reporting.
           </p>
           <p className="subtitle">
             Demo link:{' '}
@@ -1215,10 +1213,10 @@ export default function Page() {
         </section>
       ) : null}
 
-      {currentStep === 2 ? (
+      {currentStep === 6 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>2) Basin vs School Localization</h2>
+            <h2>6) Map Module - Basin vs School Localization</h2>
             <div className="row">
               <select
                 value={selectedSchool?.schoolId || ''}
@@ -1251,7 +1249,7 @@ export default function Page() {
           </div>
 
           <div className="card">
-            <h2>2b) School Technical Dossier (BL_IU_Technical)</h2>
+            <h2>6b) School Technical Dossier (BL_IU_Technical)</h2>
             {!selectedSchool ? (
               <p>Select a project to view school technical details.</p>
             ) : !selectedTechnical ? (
@@ -1315,10 +1313,10 @@ export default function Page() {
         </section>
       ) : null}
 
-      {currentStep === 3 ? (
+      {currentStep === 1 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>3) Meter Ingestion + Existing API Replay</h2>
+            <h2>1c) Meter Ingestion + Device Layer</h2>
             <p>
               Selected project: <strong>{selectedProject?.projectId || 'None'}</strong>
               {selectedSchool ? (
@@ -1357,10 +1355,10 @@ export default function Page() {
         </section>
       ) : null}
 
-      {currentStep === 4 ? (
+      {currentStep === 2 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>4) Certification Review Workspace</h2>
+            <h2>2) Certification Module</h2>
             <h3>VWBO Data Source</h3>
             <p>Choose whether VWBO certification uses live API data or an uploaded `/api/download`-format JSON file.</p>
             <div className="row">
@@ -1578,10 +1576,10 @@ export default function Page() {
         </section>
       ) : null}
 
-      {currentStep === 5 ? (
+      {currentStep === 3 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>5) VWB Eligibility / WBT Issuance</h2>
+            <h2>3) Blockchain Module - VWB Eligibility / WBT Issuance</h2>
             <p>
               Issuance is approval-gated and uses certified basin-quarter aggregate volume:
               <code>eligibleVolume = aggregatedUtilizadoM3 * 0.85</code>; <code>WBT quantity = floor(eligibleVolume)</code>.
@@ -1616,10 +1614,10 @@ export default function Page() {
         </section>
       ) : null}
 
-      {currentStep === 6 ? (
+      {currentStep === 4 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>6) Permissioned Buyer Marketplace</h2>
+            <h2>4) Marketplace Module</h2>
             <div className="row">
               <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
                 {BUYERS.map((b) => (
@@ -1677,10 +1675,22 @@ export default function Page() {
             </div>
           </div>
 
+        </section>
+      ) : null}
+
+      {currentStep === 5 ? (
+        <section className="wizardScreen">
           <div className="card">
-            <h2>6b) Buyer Retirement</h2>
+            <h2>5) Customer Account Module - Holdings + Retirement</h2>
             <div className="row">
-              <input value={retireQty} onChange={(e) => setRetireQty(e.target.value)} placeholder="Quantity" />
+              <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
+                {BUYERS.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} ({b.approved ? 'approved' : 'unapproved'})
+                  </option>
+                ))}
+              </select>
+              <input value={retireQty} onChange={(e) => setRetireQty(e.target.value)} placeholder="Retire quantity" />
             </div>
             <textarea value={retirePurpose} rows={3} onChange={(e) => setRetirePurpose(e.target.value)} />
             <div className="row">
@@ -1710,13 +1720,8 @@ export default function Page() {
               )}
             </div>
           </div>
-        </section>
-      ) : null}
-
-      {currentStep === 7 ? (
-        <section className="wizardScreen">
           <div className="card">
-            <h2>7) Certificate + Report Output</h2>
+            <h2>5b) Certificate + Report Output</h2>
             <p>
               Generated immediately at retirement and persisted via <code>/api/reports</code>.
             </p>
