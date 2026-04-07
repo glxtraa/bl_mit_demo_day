@@ -738,6 +738,10 @@ button:disabled {
   background: #fcfdff;
 }
 
+.projectDetailList {
+  max-height: 700px;
+}
+
 .item {
   padding: 9px 10px;
   border-bottom: 1px solid #edf3f8;

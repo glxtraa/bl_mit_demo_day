@@ -16,6 +16,14 @@ function contentTypeFor(filePath) {
   return 'application/octet-stream';
 }
 
+function dispositionFor(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.pdf') {
+    return 'inline';
+  }
+  return 'attachment';
+}
+
 export async function GET(request) {
   const relPath = request.nextUrl.searchParams.get('path');
   if (!relPath) {
@@ -38,7 +46,7 @@ export async function GET(request) {
     status: 200,
     headers: {
       'content-type': contentTypeFor(absolutePath),
-      'content-disposition': `attachment; filename="${fileName}"`,
+      'content-disposition': `${dispositionFor(absolutePath)}; filename="${fileName}"`,
       'cache-control': 'no-store'
     }
   });

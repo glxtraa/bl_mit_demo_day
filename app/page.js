@@ -363,6 +363,7 @@ export default function Page() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [reviewComment, setReviewComment] = useState('');
   const [projectDetailTab, setProjectDetailTab] = useState('overview');
+  const [projectSchoolPage, setProjectSchoolPage] = useState(1);
   const drawerRef = useRef(null);
 
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
@@ -520,6 +521,16 @@ export default function Page() {
       };
     });
   }, [selectedProjectSchools]);
+  const projectSchoolsPerPage = 10;
+  const projectSchoolsTotalPages = Math.max(1, Math.ceil(selectedProjectSchools.length / projectSchoolsPerPage));
+  const pagedProjectSchools = useMemo(() => {
+    const start = (projectSchoolPage - 1) * projectSchoolsPerPage;
+    return selectedProjectSchools.slice(start, start + projectSchoolsPerPage);
+  }, [selectedProjectSchools, projectSchoolPage]);
+  const pagedProjectDossierFiles = useMemo(() => {
+    const start = (projectSchoolPage - 1) * projectSchoolsPerPage;
+    return projectDossierFiles.slice(start, start + projectSchoolsPerPage);
+  }, [projectDossierFiles, projectSchoolPage]);
 
   const basinQuarterAggregates = useMemo(() => certificationData?.aggregates || [], [certificationData]);
   const basinTotals = useMemo(() => certificationData?.basinTotals || [], [certificationData]);
@@ -825,6 +836,16 @@ export default function Page() {
       document.body.style.overflow = '';
     };
   }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    setProjectSchoolPage(1);
+  }, [selectedProjectId, projectDetailTab]);
+
+  useEffect(() => {
+    if (projectSchoolPage > projectSchoolsTotalPages) {
+      setProjectSchoolPage(projectSchoolsTotalPages);
+    }
+  }, [projectSchoolPage, projectSchoolsTotalPages]);
 
   function goToStep(stepId) {
     setCurrentStep(stepId);
@@ -1519,8 +1540,30 @@ export default function Page() {
                           </select>
                           <span className="badge info">Active sub-site: {selectedSchool?.schoolId || 'N/A'}</span>
                         </div>
-                        <div className="list">
-                          {selectedProjectSchools.map((school) => (
+                        {selectedProjectSchools.length > projectSchoolsPerPage ? (
+                          <div className="row">
+                            <span className="badge info">
+                              Showing schools {Math.min((projectSchoolPage - 1) * projectSchoolsPerPage + 1, selectedProjectSchools.length)}-
+                              {Math.min(projectSchoolPage * projectSchoolsPerPage, selectedProjectSchools.length)} of {selectedProjectSchools.length}
+                            </span>
+                            <button
+                              className="secondary"
+                              disabled={projectSchoolPage <= 1}
+                              onClick={() => setProjectSchoolPage((p) => Math.max(1, p - 1))}
+                            >
+                              Previous 10
+                            </button>
+                            <button
+                              className="secondary"
+                              disabled={projectSchoolPage >= projectSchoolsTotalPages}
+                              onClick={() => setProjectSchoolPage((p) => Math.min(projectSchoolsTotalPages, p + 1))}
+                            >
+                              Next 10
+                            </button>
+                          </div>
+                        ) : null}
+                        <div className="list projectDetailList">
+                          {pagedProjectSchools.map((school) => (
                             <div className="item" key={school.schoolId}>
                               <strong>{school.schoolName}</strong> ({school.schoolId}) · meter {school.meter?.deviceId || 'N/A'} ·{' '}
                               {fmt(school.meter?.latestReadingM3 || 0)} m³ ·{' '}
@@ -1541,11 +1584,36 @@ export default function Page() {
                       </span>
                       <span className="badge info">Linked schools with dossiers: {projectDossierFiles.filter((school) => school.files.length).length}</span>
                     </div>
-                    <div className="list">
+                    <div className="list projectDetailList">
                       {projectDossierFiles.every((school) => school.files.length === 0) ? (
                         <div className="item">No school dossier files linked to this project yet.</div>
                       ) : (
-                        projectDossierFiles.map((school) => (
+                        <>
+                          {projectDossierFiles.length > projectSchoolsPerPage ? (
+                            <div className="item">
+                              <div className="row">
+                                <span className="badge info">
+                                  Showing schools {Math.min((projectSchoolPage - 1) * projectSchoolsPerPage + 1, projectDossierFiles.length)}-
+                                  {Math.min(projectSchoolPage * projectSchoolsPerPage, projectDossierFiles.length)} of {projectDossierFiles.length}
+                                </span>
+                                <button
+                                  className="secondary"
+                                  disabled={projectSchoolPage <= 1}
+                                  onClick={() => setProjectSchoolPage((p) => Math.max(1, p - 1))}
+                                >
+                                  Previous 10
+                                </button>
+                                <button
+                                  className="secondary"
+                                  disabled={projectSchoolPage >= projectSchoolsTotalPages}
+                                  onClick={() => setProjectSchoolPage((p) => Math.min(projectSchoolsTotalPages, p + 1))}
+                                >
+                                  Next 10
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
+                          {pagedProjectDossierFiles.map((school) => (
                           <div className="item" key={school.schoolId}>
                             <strong>
                               {school.schoolName} ({school.schoolId})
@@ -1581,7 +1649,8 @@ export default function Page() {
                               </div>
                             ) : null}
                           </div>
-                        ))
+                          ))}
+                        </>
                       )}
                     </div>
                   </>
