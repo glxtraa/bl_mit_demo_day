@@ -335,36 +335,61 @@ for (const [basinId, group] of byBasin.entries()) {
   });
 }
 
-const projectsSeed = schools.map((school, i) => ({
-  projectId: `BL-PROJ-${String(i + 1).padStart(3, '0')}`,
-  projectName: school.schoolName,
-  projectType: school.projectType,
-  location: {
-    basinId: school.basinId,
-    municipality: school.municipio,
-    state: school.estado,
-    country: 'Mexico',
-    lat: school.lat,
-    lon: school.lon
-  },
-  operator: school.operator,
-  status: 'under_review',
-  linkedDeviceIds: [school.meter.deviceId],
-  evidenceFiles: [
-    ...(school.evidence.photoUrl ? [school.evidence.photoUrl] : []),
-    ...((school.technical?.reportFiles || []).map((x) => x.path))
-  ],
-  certificationReviewer: 'Pending assignment',
-  methodologyStatus: 'draft',
-  notes: school.evidence.notes || '',
-  technicalSummary: school.technical
-    ? {
-        reportCount: school.technical.pdfCount,
-        imageCount: school.technical.imageCount,
-        latestYearRainMm: school.technical.precipitation?.latestYearTotalMm ?? null
-      }
-    : null
-}));
+const schoolsWithCoords = schools.filter((s) => typeof s.lat === 'number' && typeof s.lon === 'number');
+const centroidLat = schoolsWithCoords.length
+  ? Number((schoolsWithCoords.reduce((sum, s) => sum + s.lat, 0) / schoolsWithCoords.length).toFixed(6))
+  : null;
+const centroidLon = schoolsWithCoords.length
+  ? Number((schoolsWithCoords.reduce((sum, s) => sum + s.lon, 0) / schoolsWithCoords.length).toFixed(6))
+  : null;
+const uniqueBasins = [...new Set(schools.map((s) => s.basinId))];
+const uniqueMunicipios = [...new Set(schools.map((s) => s.municipio))];
+const uniqueEstados = [...new Set(schools.map((s) => s.estado))];
+
+const projectsSeed = [
+  {
+    projectId: 'BL-PROJ-SCHOOLS-001',
+    projectName: 'BL Schools Rainwater Harvesting System',
+    promoter: 'Blue Lifeline Schools Program',
+    projectType: SCHOOL_PROJECT_TYPE,
+    projectTypeLabel: SCHOOL_PROJECT_TYPE_LABEL,
+    projectScope: 'multi_site_school_system',
+    location: {
+      basinId: uniqueBasins.length === 1 ? uniqueBasins[0] : 'MULTI-BASIN',
+      municipality: uniqueMunicipios.length === 1 ? uniqueMunicipios[0] : 'MULTI-MUNICIPALITY',
+      state: uniqueEstados.length === 1 ? uniqueEstados[0] : 'MULTI-STATE',
+      country: 'Mexico',
+      lat: centroidLat,
+      lon: centroidLon
+    },
+    operator: [...new Set(schools.map((s) => s.operator).filter(Boolean))].join(', ') || 'Unknown',
+    status: 'under_review',
+    linkedDeviceIds: schools.map((s) => s.meter.deviceId),
+    linkedSchoolIds: schools.map((s) => s.schoolId),
+    siteCount: schools.length,
+    evidenceFiles: [
+      ...new Set(
+        schools.flatMap((s) => [
+          ...(s.evidence.photoUrl ? [s.evidence.photoUrl] : []),
+          ...((s.technical?.reportFiles || []).map((x) => x.path))
+        ])
+      )
+    ],
+    certificationReviewer: 'Pending assignment',
+    methodologyStatus: 'draft',
+    notes: 'Portfolio project aggregating all participating schools as one system.',
+    technicalSummary: {
+      schools: schools.length,
+      reportCount: schools.reduce((sum, s) => sum + (s.technical?.pdfCount || 0), 0),
+      imageCount: schools.reduce((sum, s) => sum + (s.technical?.imageCount || 0), 0),
+      latestYearRainMmTotal: Number(
+        schools
+          .reduce((sum, s) => sum + Number(s.technical?.precipitation?.latestYearTotalMm || 0), 0)
+          .toFixed(2)
+      )
+    }
+  }
+];
 
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, 'schools.cleaned.json'), JSON.stringify(schools, null, 2));

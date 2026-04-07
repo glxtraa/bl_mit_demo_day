@@ -39,6 +39,36 @@ Reference: `Blue_Lifeline_MVP_Webapp_Product_Definition_Concise.docx.md`
 | 4.6 Retirement | Irreversible retirement flow + before/after balance | Implemented | Step 6 flow + KPI balances |
 | 4.7 Reporting | Report generated immediately with required fields | Implemented | `/api/reports` and Step 7 output |
 
+## B2. MVP module deliverables check (latest spec)
+
+| MVP module | Deliverable from spec | Status |
+| --- | --- | --- |
+| Admin | Admin dashboard | Implemented |
+| Admin | Create promoter form | Implemented (`promoter` field in onboarding) |
+| Admin | Create project form | Implemented |
+| Admin | Document uploader | Partial (dossier downloads + uploaded certification JSON; no generic evidence uploader UI yet) |
+| Admin | Project detail page | Implemented (tabbed detail panel) |
+| Certification | Data ingestion pipeline | Implemented |
+| Certification | AI review engine | Partial (assistive recommendation + checklist style output) |
+| Certification | Certification summary page | Implemented |
+| Certification | Human approval screen | Implemented |
+| Certification | Exportable audit package | Partial (`/api/download` + report JSON; no single packaged zip export endpoint) |
+| Blockchain | Mint from approved certification | Implemented (app-layer issuance) |
+| Blockchain | Token batch page | Implemented (issuance list in Blockchain module) |
+| Blockchain | Metadata registry | Implemented (issuance metadata persisted in app records) |
+| Blockchain | Issuance history | Implemented |
+| Marketplace | Inventory list | Implemented |
+| Marketplace | Filters | Implemented (basin/type/promoter) |
+| Marketplace | Token batch detail | Implemented (inventory rows by issuance batch) |
+| Marketplace | Purchase action | Implemented |
+| Customer Account | Goal setup | Gap |
+| Customer Account | Holdings dashboard | Implemented |
+| Customer Account | Burn flow | Implemented |
+| Customer Account | Retirement reports | Implemented |
+| Map | Map with pins | Implemented |
+| Map | Filters | Partial (school selector + multi-basin chart selectors; full map filter toolbar can be expanded) |
+| Map | Project detail link | Implemented (map selection drives project/school detail) |
+
 ## C. AI component traceability
 
 | AI module from spec | Status | Implementation |

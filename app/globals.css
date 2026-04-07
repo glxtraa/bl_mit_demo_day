@@ -1,11 +1,15 @@
+@import url('https://cdn.zyrosite.com/u1/google-fonts/font-faces?family=DM+Sans:wght@400;500;600;800&family=Montserrat:wght@300;400&display=swap');
+
 :root {
-  --bg: #f1f7fb;
+  --bg: #090f1f;
   --card: #ffffff;
-  --ink: #0c2436;
-  --muted: #5f7383;
-  --line: #d6e4ee;
-  --brand: #0c9ccb;
-  --brand-dark: #116283;
+  --ink: #0f1f38;
+  --muted: #536076;
+  --line: #d4deea;
+  --brand: #192dd8;
+  --brand-dark: #101f9f;
+  --font-primary: 'DM Sans', 'Segoe UI', sans-serif;
+  --font-secondary: 'Montserrat', 'Segoe UI', sans-serif;
   --good: #17835f;
   --warn: #cc7f10;
   --bad: #b43434;
@@ -19,9 +23,12 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at top left, #dff4ff, transparent 45%), var(--bg);
+  background:
+    radial-gradient(circle at 12% -8%, rgba(25, 45, 216, 0.34), transparent 40%),
+    radial-gradient(circle at 92% 0%, rgba(38, 86, 235, 0.2), transparent 34%),
+    linear-gradient(180deg, #0b1224 0%, #090f1f 36%, #091124 100%);
   color: var(--ink);
-  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-family: var(--font-secondary);
 }
 
 a {
@@ -42,16 +49,41 @@ a {
   margin-bottom: 18px;
 }
 
+.brandIntro {
+  color: #e5ecff;
+}
+
+.brandLogoLink {
+  display: inline-flex;
+  margin-bottom: 10px;
+}
+
+.brandLogo {
+  width: auto;
+  height: 34px;
+}
+
 .title {
   margin: 0;
-  font-family: "Syne", "Segoe UI", sans-serif;
+  font-family: var(--font-primary);
+  color: #ffffff;
   font-size: 32px;
+  letter-spacing: 0.01em;
 }
 
 .subtitle {
   margin: 6px 0 0;
   color: var(--muted);
   max-width: 760px;
+}
+
+.brandIntro .subtitle {
+  color: #d3dbef;
+}
+
+.brandIntro a {
+  color: #ffffff;
+  text-decoration-color: rgba(255, 255, 255, 0.5);
 }
 
 .grid {
@@ -67,11 +99,11 @@ a {
 }
 
 .card {
-  background: var(--card);
+  background: rgba(255, 255, 255, 0.98);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 14px;
-  box-shadow: 0 8px 18px rgba(10, 40, 60, 0.06);
+  box-shadow: 0 12px 30px rgba(5, 14, 35, 0.24);
 }
 
 .stepperWrap {
@@ -97,7 +129,7 @@ a {
 
 .stepProgressFill {
   height: 100%;
-  background: linear-gradient(90deg, #0c9ccb 0%, #2ec4b6 100%);
+  background: linear-gradient(90deg, #192dd8 0%, #2b73ff 100%);
 }
 
 .stepper {
@@ -208,7 +240,7 @@ a {
 .card h2,
 .card h3 {
   margin: 0 0 8px;
-  font-family: "Syne", "Segoe UI", sans-serif;
+  font-family: var(--font-primary);
 }
 
 .card h2 {
@@ -567,7 +599,7 @@ button:disabled {
 .barFill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #0c9ccb 0%, #2ec4b6 100%);
+  background: linear-gradient(90deg, #192dd8 0%, #2b73ff 100%);
 }
 
 .barValue {

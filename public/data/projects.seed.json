@@ -1,181 +1,58 @@
 [
   {
-    "projectId": "BL-PROJ-001",
-    "projectName": "PRIMARIA BENITO JUAREZ",
+    "projectId": "BL-PROJ-SCHOOLS-001",
+    "projectName": "BL Schools Rainwater Harvesting System",
+    "promoter": "Blue Lifeline Schools Program",
     "projectType": "captacion_agua_de_lluvia_scall",
+    "projectTypeLabel": "Captación de agua de lluvia (SCALL)",
+    "projectScope": "multi_site_school_system",
     "location": {
-      "basinId": "ECATEPEC-DE-MORELOS",
-      "municipality": "ECATEPEC DE MORELOS",
+      "basinId": "MULTI-BASIN",
+      "municipality": "MULTI-MUNICIPALITY",
       "state": "ESTADO DE MEXICO",
       "country": "Mexico",
-      "lat": 19.54418,
-      "lon": -99.074364
+      "lat": 19.26829,
+      "lon": -98.89154
     },
     "operator": "MARTIN LIEDO",
     "status": "under_review",
     "linkedDeviceIds": [
-      "tlaloque-15DPR0594Z"
+      "tlaloque-15DPR0594Z",
+      "tlaloque-15ETV0293A",
+      "tlaloque-15EBH0466T",
+      "tlaloque-15DPR0454Z",
+      "tlaloque-15DTV0170S",
+      "tlaloque-15EJN3378M"
     ],
+    "linkedSchoolIds": [
+      "15DPR0594Z",
+      "15ETV0293A",
+      "15EBH0466T",
+      "15DPR0454Z",
+      "15DTV0170S",
+      "15EJN3378M"
+    ],
+    "siteCount": 6,
     "evidenceFiles": [
       "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/748605275/attachments/attan9aYM9pyomUiUWehEwju/",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0594Z/15DPR0594Z vt.pdf",
-      "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0594Z/Seguimiento 15DPR0594Z.pdf"
-    ],
-    "certificationReviewer": "Pending assignment",
-    "methodologyStatus": "draft",
-    "notes": "TODO FUNCIONA BIEN",
-    "technicalSummary": {
-      "reportCount": 2,
-      "imageCount": 7,
-      "latestYearRainMm": null
-    }
-  },
-  {
-    "projectId": "BL-PROJ-002",
-    "projectName": "SECUNDARIA OFTV NO.0194 GRAL EMILIANO ZAPATA",
-    "projectType": "captacion_agua_de_lluvia_scall",
-    "location": {
-      "basinId": "TLALMANALCO",
-      "municipality": "TLALMANALCO",
-      "state": "ESTADO DE MEXICO",
-      "country": "Mexico",
-      "lat": 19.1666583,
-      "lon": -98.7820067
-    },
-    "operator": "MARTIN LIEDO",
-    "status": "under_review",
-    "linkedDeviceIds": [
-      "tlaloque-15ETV0293A"
-    ],
-    "evidenceFiles": [
+      "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0594Z/Seguimiento 15DPR0594Z.pdf",
       "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/746538703/attachments/attqJHZ6258pANspHn7dHcHo/",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15ETV0293A/15ETV0293A.pdf",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15ETV0293A/Reporte PCV_ 15ETV0293A_ SECUNDARIA OFTV NO. 0194 GRAL EMILIANO ZAPATA, .pdf",
-      "Background/Schools/BL_IU_Technical/Piloto escuelas/15ETV0293A/Seguimiento feb26 15ETV0293A.pdf"
-    ],
-    "certificationReviewer": "Pending assignment",
-    "methodologyStatus": "draft",
-    "notes": "EL MEDIDOR NO FUNCIONA BIEN SOLO CUANDO SE CORTA A LA MITAD EL FLUJO DE AGUA EMPIEZA A FUNCIONAR",
-    "technicalSummary": {
-      "reportCount": 3,
-      "imageCount": 5,
-      "latestYearRainMm": 971.21
-    }
-  },
-  {
-    "projectId": "BL-PROJ-003",
-    "projectName": "PREPARATORIA OFICIAL NO 271",
-    "projectType": "captacion_agua_de_lluvia_scall",
-    "location": {
-      "basinId": "AMECAMECA",
-      "municipality": "AMECAMECA",
-      "state": "ESTADO DE MEXICO",
-      "country": "Mexico",
-      "lat": 19.083353,
-      "lon": -98.784394
-    },
-    "operator": "MARTIN LIEDO",
-    "status": "under_review",
-    "linkedDeviceIds": [
-      "tlaloque-15EBH0466T"
-    ],
-    "evidenceFiles": [
+      "Background/Schools/BL_IU_Technical/Piloto escuelas/15ETV0293A/Seguimiento feb26 15ETV0293A.pdf",
       "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/746539034/attachments/attgHYZspjAYNcoHp89nSGLK/",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15EBH0466T/15EBH0466T.pdf",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15EBH0466T/Reporte PCV_ 15EBH0466T_ PREPARATORIA OFICIAL NO 271, .pdf",
-      "Background/Schools/BL_IU_Technical/Piloto escuelas/15EBH0466T/Seguimiento feb26 15EBH0466T.pdf"
-    ],
-    "certificationReviewer": "Pending assignment",
-    "methodologyStatus": "draft",
-    "notes": "MEDIDOR ANALOGO",
-    "technicalSummary": {
-      "reportCount": 3,
-      "imageCount": 6,
-      "latestYearRainMm": 1201.04
-    }
-  },
-  {
-    "projectId": "BL-PROJ-004",
-    "projectName": "PRIMARIA VICENTE GUERRERO",
-    "projectType": "captacion_agua_de_lluvia_scall",
-    "location": {
-      "basinId": "CHALCO",
-      "municipality": "CHALCO",
-      "state": "ESTADO DE MEXICO",
-      "country": "Mexico",
-      "lat": 19.2423517,
-      "lon": -98.8458783
-    },
-    "operator": "MARTIN LIEDO",
-    "status": "under_review",
-    "linkedDeviceIds": [
-      "tlaloque-15DPR0454Z"
-    ],
-    "evidenceFiles": [
+      "Background/Schools/BL_IU_Technical/Piloto escuelas/15EBH0466T/Seguimiento feb26 15EBH0466T.pdf",
       "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/744685518/attachments/attTQMexAjwPc6nZyXBwB52s/",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0454Z/15DPR0454Z.pdf",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0454Z/Reporte PCV_ 15DPR0454Z_ PRIMARIA VICENTE GUERRERO, .pdf",
-      "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0454Z/Seguimiento  15DPR0454Z.pdf"
-    ],
-    "certificationReviewer": "Pending assignment",
-    "methodologyStatus": "draft",
-    "notes": "ANALOGO",
-    "technicalSummary": {
-      "reportCount": 3,
-      "imageCount": 4,
-      "latestYearRainMm": 810.3
-    }
-  },
-  {
-    "projectId": "BL-PROJ-005",
-    "projectName": "TELESECUNDARIA IGNACIO ALLENDE",
-    "projectType": "captacion_agua_de_lluvia_scall",
-    "location": {
-      "basinId": "CHALCO",
-      "municipality": "CHALCO",
-      "state": "ESTADO DE MEXICO",
-      "country": "Mexico",
-      "lat": 19.227573,
-      "lon": -98.91979
-    },
-    "operator": "MARTIN LIEDO",
-    "status": "under_review",
-    "linkedDeviceIds": [
-      "tlaloque-15DTV0170S"
-    ],
-    "evidenceFiles": [
+      "Background/Schools/BL_IU_Technical/Piloto escuelas/15DPR0454Z/Seguimiento  15DPR0454Z.pdf",
       "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/744685980/attachments/attyPYaqtboKNAf7JeRJM4dj/",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15DTV0170S/15DTV0170S.pdf",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15DTV0170S/Reporte PCV_ 15DTV0170S_ TELESECUNDARIA IGNACIO ALLENDE, .pdf",
-      "Background/Schools/BL_IU_Technical/Piloto escuelas/15DTV0170S/Seguimiento 15DTV0170S.pdf"
-    ],
-    "certificationReviewer": "Pending assignment",
-    "methodologyStatus": "draft",
-    "notes": "MEDIDOR ANALOGO",
-    "technicalSummary": {
-      "reportCount": 3,
-      "imageCount": 5,
-      "latestYearRainMm": 1056.97
-    }
-  },
-  {
-    "projectId": "BL-PROJ-006",
-    "projectName": "PREESCOLAR RICARDO FLORES MAGON",
-    "projectType": "captacion_agua_de_lluvia_scall",
-    "location": {
-      "basinId": "LA-PAZ",
-      "municipality": "LA PAZ",
-      "state": "ESTADO DE MEXICO",
-      "country": "Mexico",
-      "lat": 19.3456217,
-      "lon": -98.9428083
-    },
-    "operator": "MARTIN LIEDO",
-    "status": "under_review",
-    "linkedDeviceIds": [
-      "tlaloque-15EJN3378M"
-    ],
-    "evidenceFiles": [
+      "Background/Schools/BL_IU_Technical/Piloto escuelas/15DTV0170S/Seguimiento 15DTV0170S.pdf",
       "https://eu.kobotoolbox.org/api/v2/assets/a6qYYJMsNMpMwTw34myxrK/data/750450637/attachments/attry2LjyWxN9nnSriHhkgVU/",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15EJN3378M/Línea base 15EJN3378M.pdf",
       "Background/Schools/BL_IU_Technical/Piloto escuelas/15EJN3378M/Reporte PCV_ 15EJN3378M_ PREESCOLAR RICARDO FLORES MAGON, .pdf",
@@ -183,11 +60,12 @@
     ],
     "certificationReviewer": "Pending assignment",
     "methodologyStatus": "draft",
-    "notes": "NO LE PONEN AGUA DE OTRA FUENTE AL TANQUE DEL SCALL",
+    "notes": "Portfolio project aggregating all participating schools as one system.",
     "technicalSummary": {
-      "reportCount": 3,
-      "imageCount": 5,
-      "latestYearRainMm": 852.33
+      "schools": 6,
+      "reportCount": 17,
+      "imageCount": 32,
+      "latestYearRainMmTotal": 4891.85
     }
   }
 ]

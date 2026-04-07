@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 const BUYERS = [
   { id: 'buyer-1', name: 'Acme Manufacturing', approved: true, role: 'buyer' },
@@ -244,7 +245,7 @@ function MiniLineChart({ title, points = [], unit = 'm3' }) {
       <svg className="lineChart" viewBox={`0 0 ${w} ${h}`} aria-label={title}>
         <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke="#d4e2ec" strokeWidth="1" />
         <line x1={pad} y1={pad} x2={pad} y2={h - pad} stroke="#d4e2ec" strokeWidth="1" />
-        <path d={path} fill="none" stroke="#0c9ccb" strokeWidth="2.5" />
+        <path d={path} fill="none" stroke="#192dd8" strokeWidth="2.5" />
       </svg>
       <div className="lineLegend">
         <span>
@@ -321,6 +322,7 @@ export default function Page() {
   const [projects, setProjects] = useState([]);
   const [basins, setBasins] = useState({ type: 'FeatureCollection', features: [] });
   const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedSchoolId, setSelectedSchoolId] = useState('');
   const [reviews, setReviews] = useState({});
   const [issuances, setIssuances] = useState([]);
   const [retirements, setRetirements] = useState([]);
@@ -422,6 +424,7 @@ export default function Page() {
       setProjects(projectsData);
       setBasins(basinsData);
       setSelectedProjectId(projectsData[0]?.projectId || '');
+      setSelectedSchoolId(schoolsData[0]?.schoolId || '');
       setSelectedBasinId(projectsData[0]?.location?.basinId || schoolsData[0]?.basinId || '');
       setApiDownload(downloadData);
       try {
@@ -452,10 +455,14 @@ export default function Page() {
   );
 
   const selectedSchool = useMemo(() => {
+    if (selectedSchoolId) {
+      const byId = schools.find((s) => s.schoolId === selectedSchoolId);
+      if (byId) return byId;
+    }
     if (!selectedProject) return null;
     const device = selectedProject.linkedDeviceIds?.[0];
     return schools.find((s) => s.meter?.deviceId === device) || null;
-  }, [selectedProject, schools]);
+  }, [selectedProject, schools, selectedSchoolId]);
 
   useEffect(() => {
     if (!selectedProject) return;
@@ -611,6 +618,7 @@ export default function Page() {
   function selectSchoolProjectBySchoolId(schoolId) {
     const school = schools.find((s) => s.schoolId === schoolId);
     if (!school) return;
+    setSelectedSchoolId(schoolId);
     const project = projects.find((p) => (p.linkedDeviceIds || []).includes(school?.meter?.deviceId));
     if (project) {
       setSelectedProjectId(project.projectId);
@@ -644,6 +652,7 @@ export default function Page() {
       promoter: newProject.promoter || 'Unspecified promoter',
       projectType: newProject.projectType,
       projectTypeLabel,
+      projectScope: 'single_site_complex_project',
       location: {
         basinId: newProject.basinId || 'UNIDENTIFIED',
         municipality: 'Custom',
@@ -655,6 +664,8 @@ export default function Page() {
       operator: 'Demo Admin',
       status: 'draft',
       linkedDeviceIds: [`tlaloque-${id}`],
+      linkedSchoolIds: [],
+      siteCount: 1,
       evidenceFiles: [],
       certificationReviewer: 'Pending assignment',
       methodologyStatus: 'draft',
@@ -823,6 +834,12 @@ export default function Page() {
     if (!selectedProject) return;
     setSimBusy(true);
     try {
+      const targetDeviceId = selectedSchool?.meter?.deviceId || selectedProject.linkedDeviceIds?.[0];
+      const targetSchoolId = selectedSchool?.schoolId || selectedProject.projectId;
+      if (!targetDeviceId) {
+        addTimeline('Simulation blocked: no target device found.');
+        return;
+      }
       const monthKey = monthKeyFromDate();
       const monthlyIndexRaw = Number(selectedRainProfile?.monthlySeasonalityIndex?.[monthKey] || 1);
       const monthlyIndex = Number.isFinite(monthlyIndexRaw) ? monthlyIndexRaw : 1;
@@ -831,8 +848,8 @@ export default function Page() {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          schoolId: selectedProject.projectId,
-          deviceId: selectedProject.linkedDeviceIds[0],
+          schoolId: targetSchoolId,
+          deviceId: targetDeviceId,
           currentReadingM3: selectedSchool?.meter?.latestReadingM3 || 0,
           points: 4,
           stepM3: Number((1.2 * seasonalMultiplier).toFixed(2)),
@@ -849,7 +866,7 @@ export default function Page() {
         const latest = result.measurements[result.measurements.length - 1];
         setSchools((prev) =>
           prev.map((s) =>
-            s.meter?.deviceId === selectedProject.linkedDeviceIds[0]
+            s.meter?.deviceId === targetDeviceId
               ? {
                   ...s,
                   meter: {
@@ -961,7 +978,17 @@ export default function Page() {
   return (
     <main className="page">
       <section className="header">
-        <div>
+        <div className="brandIntro">
+          <a className="brandLogoLink" href="https://bluelifeline.org/" target="_blank" rel="noreferrer" aria-label="Blue Lifeline website">
+            <Image
+              src="/brand/bluelifeline-logo-wordmark.png"
+              alt="Blue Lifeline"
+              width={220}
+              height={38}
+              className="brandLogo"
+              priority
+            />
+          </a>
           <h1 className="title">Blue Lifeline MVP Modules Console</h1>
           <p className="subtitle">
             Refactored to 6 MVP modules from the latest spec: Admin, Certification, Blockchain, Marketplace, Customer Account,
@@ -1114,6 +1141,7 @@ export default function Page() {
                     <span className="badge info">{p.projectTypeLabel || SCHOOL_PROJECT_TYPE_LABEL}</span>{' '}
                     <span className="badge info">{p.location?.basinId}</span>
                     <span className="badge info">{p.promoter || p.operator || 'No promoter'}</span>
+                    <span className="badge info">{p.siteCount || 1} site(s)</span>
                   </div>
                   <button className="secondary" onClick={() => setSelectedProjectId(p.projectId)}>
                     Select
@@ -1154,11 +1182,13 @@ export default function Page() {
                       <span className="badge info">Type: {selectedProject.projectTypeLabel || selectedProject.projectType}</span>
                       <span className="badge info">Basin: {selectedProject.location?.basinId || 'N/A'}</span>
                       <span className="badge info">Device: {selectedProject.linkedDeviceIds?.[0] || 'N/A'}</span>
+                      <span className="badge info">Scope: {selectedProject.projectScope || 'single_site'}</span>
                     </div>
                     <div className="row">
                       <span className="badge info">Status: {selectedProject.status || 'N/A'}</span>
                       <span className="badge info">Method status: {selectedProject.methodologyStatus || 'N/A'}</span>
                       <span className="badge info">Reviewer: {selectedProject.certificationReviewer || 'N/A'}</span>
+                      <span className="badge info">Linked schools: {selectedProject.linkedSchoolIds?.length || 0}</span>
                     </div>
                   </>
                 ) : null}
@@ -1238,7 +1268,7 @@ export default function Page() {
               <RealMapClient
                 schools={schools}
                 basins={basins}
-                selectedDeviceId={selectedProject?.linkedDeviceIds?.[0] || null}
+                selectedDeviceId={selectedSchool?.meter?.deviceId || selectedProject?.linkedDeviceIds?.[0] || null}
                 onSelectSchool={(school) => selectSchoolProjectBySchoolId(school.schoolId)}
               />
             )}
