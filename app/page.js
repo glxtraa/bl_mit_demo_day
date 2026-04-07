@@ -562,7 +562,6 @@ export default function Page() {
   }, [selectedChartBasins, basinQuarterAggregates]);
   const selectedAggregateApproval = approvedIssuanceBasis[`${selectedBasinId}::${selectedQuarter}`] || null;
   const currentStepMeta = steps.find((s) => s.id === currentStep) || steps[0];
-  const stepProgressPct = Math.round((currentStep / steps.length) * 100);
   const workflowStatus = useMemo(
     () => [
       { label: 'Admin', done: projects.length > 0 && (apiDownload?.records?.length || 0) > 0 },
@@ -1087,9 +1086,7 @@ export default function Page() {
             </button>
             <div>
               <strong>{currentStepMeta.title}</strong>
-              <p>
-                Step {currentStep} of {steps.length}
-              </p>
+              <p>{currentStepMeta.role}</p>
             </div>
             <span className={`badge ${currentStageDone ? 'good' : 'warn'}`}>{currentStageDone ? 'ready' : 'active'}</span>
           </header>
@@ -1168,38 +1165,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="stepperWrap card" id="mvp-modules">
-        <div className="stepNow">
-          <strong>
-            Step {currentStep} of {steps.length}: {currentStepMeta.title}
-          </strong>
-          <span className="badge info">{stepProgressPct}%</span>
-          <span className="badge info">{currentStepMeta.role}</span>
-          <StatusPill {...currentStageMeta} />
-        </div>
-        <div className="stepProgress">
-          <div className="stepProgressFill" style={{ width: `${stepProgressPct}%` }} />
-        </div>
-        <div className="stepper">
-          {steps.map((step) => (
-            <button
-              key={step.id}
-              className={`stepChip ${currentStep === step.id ? 'active' : ''} ${currentStep > step.id ? 'done' : ''}`}
-              onClick={() => setCurrentStep(step.id)}
-            >
-              <span>{step.id}</span>
-              {step.title}
-            </button>
-          ))}
-        </div>
-        <div className="row desktopStepControls">
-          <button className="secondary" disabled={currentStep === 1} onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}>
-            Previous
-          </button>
-          <button disabled={currentStep === steps.length} onClick={() => setCurrentStep((s) => Math.min(steps.length, s + 1))}>
-            Next
-          </button>
-        </div>
+      <section className="card statusBoard" id="mvp-modules">
+        <h3>Live Status Cues</h3>
         <div className="workflowStrip">
           {workflowStatus.map((s) => (
             <span key={s.label} className={`workflowItem ${s.done ? 'done' : 'pending'}`}>
@@ -1207,9 +1174,6 @@ export default function Page() {
             </span>
           ))}
         </div>
-      </section>
-      <section className="card statusBoard">
-        <h3>Live Status Cues</h3>
         <div className="row">
           <StatusPill {...statusMeta(selectedProject?.status || 'draft')} />
           <StatusPill {...meterMeta(selectedSchool?.meter?.status || 'unknown')} />
@@ -1229,7 +1193,7 @@ export default function Page() {
       {currentStep === 1 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>1) Project Onboarding</h2>
+            <h2>Project Onboarding</h2>
             <p className="subtitle">Project model supports multi-type onboarding; current school seeds remain SCALL-focused.</p>
             <div className="row">
               <input
@@ -1280,7 +1244,7 @@ export default function Page() {
             </div>
           </div>
           <div className="card">
-            <h2>1b) Project Detail Snapshot</h2>
+            <h2>Project Detail Snapshot</h2>
             {!selectedProject ? (
               <p>Select a project to see detail, evidence, and issuance links.</p>
             ) : (
@@ -1375,7 +1339,7 @@ export default function Page() {
       {currentStep === 6 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>6) Map Module - Basin vs School Localization</h2>
+            <h2>Map Module - Basin vs School Localization</h2>
             <div className="row">
               <select
                 value={selectedSchool?.schoolId || ''}
@@ -1408,7 +1372,7 @@ export default function Page() {
           </div>
 
           <div className="card">
-            <h2>6b) School Technical Dossier (BL_IU_Technical)</h2>
+            <h2>School Technical Dossier (BL_IU_Technical)</h2>
             {!selectedSchool ? (
               <p>Select a project to view school technical details.</p>
             ) : !selectedTechnical ? (
@@ -1475,7 +1439,7 @@ export default function Page() {
       {currentStep === 1 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>1c) Meter Ingestion + Device Layer</h2>
+            <h2>Meter Ingestion + Device Layer</h2>
             <p>
               Selected project: <strong>{selectedProject?.projectId || 'None'}</strong>
               {selectedSchool ? (
@@ -1517,7 +1481,7 @@ export default function Page() {
       {currentStep === 2 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>2) Certification Module</h2>
+            <h2>Certification Module</h2>
             <h3>VWBO Data Source</h3>
             <p>Choose whether VWBO certification uses live API data or an uploaded `/api/download`-format JSON file.</p>
             <div className="row">
@@ -1738,7 +1702,7 @@ export default function Page() {
       {currentStep === 3 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>3) Blockchain Module - VWB Eligibility / WBT Issuance</h2>
+            <h2>Blockchain Module - VWB Eligibility / WBT Issuance</h2>
             <p>
               Issuance is approval-gated and uses certified basin-quarter aggregate volume:
               <code>eligibleVolume = aggregatedUtilizadoM3 * 0.85</code>; <code>WBT quantity = floor(eligibleVolume)</code>.
@@ -1776,7 +1740,7 @@ export default function Page() {
       {currentStep === 4 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>4) Marketplace Module</h2>
+            <h2>Marketplace Module</h2>
             <div className="row">
               <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
                 {BUYERS.map((b) => (
@@ -1840,7 +1804,7 @@ export default function Page() {
       {currentStep === 5 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>5) Customer Account Module - Holdings + Retirement</h2>
+            <h2>Customer Account Module - Holdings + Retirement</h2>
             <div className="row">
               <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
                 {BUYERS.map((b) => (
@@ -1880,7 +1844,7 @@ export default function Page() {
             </div>
           </div>
           <div className="card">
-            <h2>5b) Certificate + Report Output</h2>
+            <h2>Certificate + Report Output</h2>
             <p>
               Generated immediately at retirement and persisted via <code>/api/reports</code>.
             </p>
@@ -1925,9 +1889,7 @@ export default function Page() {
           Previous
         </button>
         <div className="mobileStageMeta">
-          <span>
-            Step {currentStep} of {steps.length}
-          </span>
+          <span>{currentStepMeta.role}</span>
           <strong>{currentStepMeta.title}</strong>
         </div>
         <button disabled={currentStep === steps.length} onClick={() => setCurrentStep((s) => Math.min(steps.length, s + 1))}>
