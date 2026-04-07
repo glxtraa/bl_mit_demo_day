@@ -11,6 +11,11 @@ const BUYERS = [
 const METHOD_VERSION = 'VWBA-0.9-demo';
 const SCHOOL_PROJECT_TYPE = 'captacion_agua_de_lluvia_scall';
 const SCHOOL_PROJECT_TYPE_LABEL = 'Captación de agua de lluvia (SCALL)';
+const PROJECT_TYPES = [
+  { value: 'captacion_agua_de_lluvia_scall', label: 'Captación de agua de lluvia (SCALL)' },
+  { value: 'desalination_water_treatment', label: 'Desalination / Water Treatment' },
+  { value: 'leak_reduction_efficiency', label: 'Leak Reduction / Efficiency' }
+];
 
 const steps = [
   { id: 1, title: 'Project' },
@@ -326,6 +331,7 @@ export default function Page() {
   const [retirePurpose, setRetirePurpose] = useState('Demo day retirement claim');
   const [newProject, setNewProject] = useState({
     projectName: '',
+    promoter: '',
     projectType: SCHOOL_PROJECT_TYPE,
     basinId: '',
     lat: '',
@@ -346,6 +352,7 @@ export default function Page() {
   const [lastReport, setLastReport] = useState(null);
   const [basinError, setBasinError] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
+  const [reviewComment, setReviewComment] = useState('');
 
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
 
@@ -587,11 +594,13 @@ export default function Page() {
   function createProject() {
     if (!newProject.projectName.trim()) return;
     const id = `BL-PROJ-${String(projects.length + 1).padStart(3, '0')}`;
+    const projectTypeLabel = PROJECT_TYPES.find((x) => x.value === newProject.projectType)?.label || newProject.projectType;
     const created = {
       projectId: id,
       projectName: newProject.projectName,
+      promoter: newProject.promoter || 'Unspecified promoter',
       projectType: newProject.projectType,
-      projectTypeLabel: SCHOOL_PROJECT_TYPE_LABEL,
+      projectTypeLabel,
       location: {
         basinId: newProject.basinId || 'UNIDENTIFIED',
         municipality: 'Custom',
@@ -610,7 +619,7 @@ export default function Page() {
     };
     setProjects((p) => [created, ...p]);
     setSelectedProjectId(id);
-    setNewProject({ projectName: '', projectType: SCHOOL_PROJECT_TYPE, basinId: '', lat: '', lon: '' });
+    setNewProject({ projectName: '', promoter: '', projectType: SCHOOL_PROJECT_TYPE, basinId: '', lat: '', lon: '' });
     addTimeline(`Created project ${id} (${created.projectName}).`);
     recordAudit({ type: 'project_created', projectId: id, projectName: created.projectName });
   }
@@ -635,6 +644,7 @@ export default function Page() {
       decision,
       timestamp: new Date().toISOString(),
       methodologyVersion: METHOD_VERSION,
+      comments: reviewComment || '',
       ai
     };
     setReviews((r) => ({ ...r, [selectedProject.projectId]: review }));
@@ -651,11 +661,13 @@ export default function Page() {
       )
     );
     addTimeline(`${review.reviewer} set ${selectedProject.projectId} to ${decision}.`);
+    setReviewComment('');
     recordAudit({
       type: 'review_decision',
       projectId: selectedProject.projectId,
       reviewer: review.reviewer,
       decision,
+      comments: review.comments,
       methodologyVersion: METHOD_VERSION
     });
   }
@@ -981,15 +993,24 @@ export default function Page() {
         <section className="wizardScreen">
           <div className="card">
             <h2>1) Project Onboarding</h2>
-            <p className="subtitle">All schools use project type: {SCHOOL_PROJECT_TYPE_LABEL}.</p>
+            <p className="subtitle">Project model supports multi-type onboarding; current school seeds remain SCALL-focused.</p>
             <div className="row">
               <input
                 value={newProject.projectName}
                 placeholder="Project name"
                 onChange={(e) => setNewProject((x) => ({ ...x, projectName: e.target.value }))}
               />
+              <input
+                value={newProject.promoter}
+                placeholder="Promoter / developer"
+                onChange={(e) => setNewProject((x) => ({ ...x, promoter: e.target.value }))}
+              />
               <select value={newProject.projectType} onChange={(e) => setNewProject((x) => ({ ...x, projectType: e.target.value }))}>
-                <option value={SCHOOL_PROJECT_TYPE}>{SCHOOL_PROJECT_TYPE_LABEL}</option>
+                {PROJECT_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="row">
@@ -1011,6 +1032,7 @@ export default function Page() {
                     <StatusPill {...statusMeta(p.status)} />{' '}
                     <span className="badge info">{p.projectTypeLabel || SCHOOL_PROJECT_TYPE_LABEL}</span>{' '}
                     <span className="badge info">{p.location?.basinId}</span>
+                    <span className="badge info">{p.promoter || p.operator || 'No promoter'}</span>
                   </div>
                   <button className="secondary" onClick={() => setSelectedProjectId(p.projectId)}>
                     Select
@@ -1324,6 +1346,12 @@ export default function Page() {
               <StatusPill {...reviewMeta(reviews[selectedProject?.projectId || '']?.decision)} />
             </div>
             <p>Missing evidence: {aiForSelected?.missing?.length ? aiForSelected.missing.join(', ') : 'None'}</p>
+            <textarea
+              value={reviewComment}
+              rows={3}
+              placeholder="Reviewer comments (required in real certification)"
+              onChange={(e) => setReviewComment(e.target.value)}
+            />
             <div className="row">
               <button disabled={!selectedProject} onClick={() => saveReview('approve')}>
                 Human approve

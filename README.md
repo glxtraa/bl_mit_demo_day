@@ -11,6 +11,12 @@ Vercel-ready end-to-end demo for MIT Demo Day covering:
   - Uses real OpenStreetMap tiles (Leaflet)
   - Uses real HydroBASINS polygons only (no fallback)
 
+## Current implementation docs
+
+Detailed implementation + replication docs live in:
+
+- `Background/current_demo_implementation_docs/README.md`
+
 ## 1) Prepare data assets
 
 ```bash
