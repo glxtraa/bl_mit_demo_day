@@ -341,10 +341,8 @@ export default function Page() {
     promoter: '',
     projectType: SCHOOL_PROJECT_TYPE,
     projectScope: 'multi_site_school_system',
-    municipality: '',
-    state: 'Estado de Mexico',
     country: 'Mexico',
-    basinId: '',
+    systemContext: 'school_network',
     linkedSchoolIds: []
   });
   const [simBusy, setSimBusy] = useState(false);
@@ -506,11 +504,19 @@ export default function Page() {
           name: 'Precipitation CSV'
         });
       }
+      const photoSamples = tech.photoSamples || [];
+      photoSamples.forEach((photoPath) => {
+        files.push({
+          path: photoPath,
+          name: photoPath.split('/').pop() || 'Photo file'
+        });
+      });
       return {
         schoolId: school.schoolId,
         schoolName: school.schoolName,
         files,
-        imageCount: tech.imageCount || 0
+        imageCount: tech.imageCount || 0,
+        photoSamples
       };
     });
   }, [selectedProjectSchools]);
@@ -878,9 +884,6 @@ export default function Page() {
     const linkedSchools = schools.filter((school) => newProject.linkedSchoolIds.includes(school.schoolId));
     const linkedDeviceIds = [...new Set(linkedSchools.map((school) => school?.meter?.deviceId).filter(Boolean))];
     const linkedSchoolIds = linkedSchools.map((school) => school.schoolId);
-    const uniqueBasins = [...new Set(linkedSchools.map((school) => school.basinId).filter(Boolean))];
-    const derivedBasinId =
-      newProject.basinId.trim() || (uniqueBasins.length === 1 ? uniqueBasins[0] : uniqueBasins.length > 1 ? 'MULTI-BASIN' : 'UNIDENTIFIED');
     const created = {
       projectId: id,
       projectName: newProject.projectName,
@@ -888,10 +891,11 @@ export default function Page() {
       projectType: newProject.projectType,
       projectTypeLabel,
       projectScope: newProject.projectScope,
+      systemContext: newProject.systemContext,
       location: {
-        basinId: derivedBasinId,
-        municipality: newProject.municipality || 'Multiple municipalities',
-        state: newProject.state || 'N/A',
+        basinId: 'TO_BE_DEFINED_AT_SUBPROJECT_LEVEL',
+        municipality: 'TO_BE_DEFINED_AT_SUBPROJECT_LEVEL',
+        state: 'TO_BE_DEFINED_AT_SUBPROJECT_LEVEL',
         country: newProject.country || 'N/A',
         lat: null,
         lon: null
@@ -913,10 +917,8 @@ export default function Page() {
       promoter: '',
       projectType: SCHOOL_PROJECT_TYPE,
       projectScope: 'multi_site_school_system',
-      municipality: '',
-      state: 'Estado de Mexico',
       country: 'Mexico',
-      basinId: '',
+      systemContext: 'school_network',
       linkedSchoolIds: []
     });
     addTimeline(`Created project ${id} (${created.projectName}).`);
@@ -1372,7 +1374,7 @@ export default function Page() {
           <div className="card">
             <h2>Project Onboarding</h2>
             <p className="subtitle">
-              Define the parent project first, then link one or many school sub-sites. Basin and device metadata can be derived from linked schools.
+              Define the parent project first, then define sub-project sites/assets. Basin and geolocation are configured at sub-project level.
             </p>
             <div className="row">
               <input
@@ -1397,40 +1399,45 @@ export default function Page() {
               <select value={newProject.projectScope} onChange={(e) => setNewProject((x) => ({ ...x, projectScope: e.target.value }))}>
                 <option value="multi_site_school_system">Multi-site school system</option>
                 <option value="single_site_complex_project">Single site project</option>
+                <option value="multi_site_city_network">Multi-site city network</option>
+                <option value="multi_site_industrial_program">Multi-site industrial program</option>
               </select>
-              <input
-                value={newProject.municipality}
-                placeholder="Municipality / region"
-                onChange={(e) => setNewProject((x) => ({ ...x, municipality: e.target.value }))}
-              />
-              <input value={newProject.state} placeholder="State" onChange={(e) => setNewProject((x) => ({ ...x, state: e.target.value }))} />
               <input value={newProject.country} placeholder="Country" onChange={(e) => setNewProject((x) => ({ ...x, country: e.target.value }))} />
+              <select value={newProject.systemContext} onChange={(e) => setNewProject((x) => ({ ...x, systemContext: e.target.value }))}>
+                <option value="school_network">School network</option>
+                <option value="municipal_network">Municipal leak reduction network</option>
+                <option value="industrial_facilities">Industrial facilities program</option>
+                <option value="commercial_buildings">Commercial building portfolio</option>
+                <option value="campus_utility">Campus utility system</option>
+              </select>
             </div>
             <div className="row">
-              <input
-                value={newProject.basinId}
-                placeholder="Declared basin ID (optional)"
-                onChange={(e) => setNewProject((x) => ({ ...x, basinId: e.target.value }))}
-              />
               <button onClick={createProject}>Create project</button>
             </div>
             <div className="row">
               <span className="badge info">Linked sub-sites selected: {newProject.linkedSchoolIds.length}</span>
-              <span className="badge info">Derived basin: auto from linked schools (or declared basin)</span>
+              <span className="badge info">Basin + coordinates: configured at sub-project level</span>
             </div>
-            <div className="list">
-              {schools.map((school) => {
-                const checked = newProject.linkedSchoolIds.includes(school.schoolId);
-                return (
-                  <label key={school.schoolId} className="item schoolPickerRow">
-                    <input type="checkbox" checked={checked} onChange={() => toggleNewProjectSchool(school.schoolId)} />
-                    <span>
-                      <strong>{school.schoolName}</strong> ({school.schoolId}) · basin {school.basinId} · meter {school.meter?.deviceId || 'N/A'}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
+            {newProject.systemContext === 'school_network' ? (
+              <div className="list">
+                {schools.map((school) => {
+                  const checked = newProject.linkedSchoolIds.includes(school.schoolId);
+                  return (
+                    <label key={school.schoolId} className="item schoolPickerRow">
+                      <input type="checkbox" checked={checked} onChange={() => toggleNewProjectSchool(school.schoolId)} />
+                      <span>
+                        <strong>{school.schoolName}</strong> ({school.schoolId}) · basin {school.basinId} · meter {school.meter?.deviceId || 'N/A'}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="code">
+                Selected context: {newProject.systemContext}. Configure specific sub-project assets (city sectors, plants, or facilities) in the next onboarding
+                iteration; this parent project can already be created now.
+              </div>
+            )}
 
             <div className="list">
               {projects.map((p) => (
@@ -1442,6 +1449,7 @@ export default function Page() {
                     <span className="badge info">{p.location?.basinId}</span>
                     <span className="badge info">{p.promoter || p.operator || 'No promoter'}</span>
                     <span className="badge info">{p.siteCount || 1} site(s)</span>
+                    <span className="badge info">{p.systemContext || 'system_context_tbd'}</span>
                   </div>
                   <button className="secondary" onClick={() => setSelectedProjectId(p.projectId)}>
                     Select
@@ -1485,6 +1493,7 @@ export default function Page() {
                       <span className="badge info">Type: {selectedProject.projectTypeLabel || selectedProject.projectType}</span>
                       <span className="badge info">Basin: {selectedProject.location?.basinId || 'N/A'}</span>
                       <span className="badge info">Scope: {selectedProject.projectScope || 'single_site'}</span>
+                      <span className="badge info">System: {selectedProject.systemContext || 'N/A'}</span>
                       <span className="badge info">Sub-sites: {selectedProjectSchools.length}</span>
                       <span className="badge info">Portfolio reading: {fmt(portfolioReadingM3)} m³</span>
                     </div>
@@ -1551,6 +1560,26 @@ export default function Page() {
                                 </a>
                               ))}
                             </div>
+                            {school.photoSamples?.length ? (
+                              <div className="photoGrid">
+                                {school.photoSamples.slice(0, 12).map((photoPath) => (
+                                  <a
+                                    key={photoPath}
+                                    href={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="photoThumbLink"
+                                  >
+                                    <img
+                                      src={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`}
+                                      alt={`${school.schoolName} dossier sample`}
+                                      className="photoThumb"
+                                      loading="lazy"
+                                    />
+                                  </a>
+                                ))}
+                              </div>
+                            ) : null}
                           </div>
                         ))
                       )}
