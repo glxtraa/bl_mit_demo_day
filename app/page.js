@@ -478,6 +478,20 @@ export default function Page() {
     () => (selectedSchool ? rainSeasonality?.schools?.[selectedSchool.schoolId] || null : null),
     [rainSeasonality, selectedSchool]
   );
+  const selectedProjectSchools = useMemo(() => {
+    if (!selectedProject) return [];
+    const linkedSchoolIds = new Set(selectedProject.linkedSchoolIds || []);
+    const linkedDeviceIds = new Set(selectedProject.linkedDeviceIds || []);
+    return schools.filter((school) => linkedSchoolIds.has(school.schoolId) || linkedDeviceIds.has(school?.meter?.deviceId));
+  }, [selectedProject, schools]);
+  const portfolioReadingM3 = useMemo(
+    () => selectedProjectSchools.reduce((sum, school) => sum + Number(school?.meter?.latestReadingM3 || 0), 0),
+    [selectedProjectSchools]
+  );
+  const portfolioOnlineCount = useMemo(
+    () => selectedProjectSchools.filter((school) => school?.meter?.status === 'online').length,
+    [selectedProjectSchools]
+  );
 
   const basinQuarterAggregates = useMemo(() => certificationData?.aggregates || [], [certificationData]);
   const basinTotals = useMemo(() => certificationData?.basinTotals || [], [certificationData]);
@@ -1106,16 +1120,6 @@ export default function Page() {
             />
           </a>
           <h1 className="title">Blue Lifeline MVP Modules Console</h1>
-          <p className="subtitle">
-            Refactored to 6 MVP modules from the latest spec: Admin, Certification, Blockchain, Marketplace, Customer Account,
-            and Map. Includes school dataset, SSCAP ingestion/replay, issuance, retirement, and audit-ready reporting.
-          </p>
-          <p className="subtitle">
-            Demo link:{' '}
-            <a href={demoUrl} target="_blank" rel="noreferrer">
-              {demoUrl}
-            </a>
-          </p>
           <div className="heroActions">
             <a className="heroCta heroCtaPrimary" href="https://bluelifeline.org/" target="_blank" rel="noreferrer">
               Visit Blue Lifeline
@@ -1270,19 +1274,50 @@ export default function Page() {
                 </p>
                 {projectDetailTab === 'overview' ? (
                   <>
+                    <p className="subtitle">
+                      This is a parent project portfolio. Each linked school operates as a sub-site with its own meter and evidence.
+                    </p>
                     <div className="row">
                       <span className="badge info">Promoter: {selectedProject.promoter || selectedProject.operator || 'N/A'}</span>
                       <span className="badge info">Type: {selectedProject.projectTypeLabel || selectedProject.projectType}</span>
                       <span className="badge info">Basin: {selectedProject.location?.basinId || 'N/A'}</span>
-                      <span className="badge info">Device: {selectedProject.linkedDeviceIds?.[0] || 'N/A'}</span>
                       <span className="badge info">Scope: {selectedProject.projectScope || 'single_site'}</span>
+                      <span className="badge info">Sub-sites: {selectedProjectSchools.length}</span>
+                      <span className="badge info">Portfolio reading: {fmt(portfolioReadingM3)} m³</span>
+                    </div>
+                    <div className="row">
+                      <span className="badge info">Devices: {selectedProject.linkedDeviceIds?.length || 0}</span>
+                      <span className="badge good">Meters online: {portfolioOnlineCount}</span>
                     </div>
                     <div className="row">
                       <span className="badge info">Status: {selectedProject.status || 'N/A'}</span>
                       <span className="badge info">Method status: {selectedProject.methodologyStatus || 'N/A'}</span>
                       <span className="badge info">Reviewer: {selectedProject.certificationReviewer || 'N/A'}</span>
-                      <span className="badge info">Linked schools: {selectedProject.linkedSchoolIds?.length || 0}</span>
+                      <span className="badge info">Linked school IDs: {selectedProject.linkedSchoolIds?.length || 0}</span>
                     </div>
+                    {selectedProjectSchools.length ? (
+                      <>
+                        <div className="row">
+                          <select value={selectedSchool?.schoolId || ''} onChange={(e) => selectSchoolProjectBySchoolId(e.target.value)}>
+                            {selectedProjectSchools.map((school) => (
+                              <option key={school.schoolId} value={school.schoolId}>
+                                {school.schoolName} · {school.meter?.deviceId}
+                              </option>
+                            ))}
+                          </select>
+                          <span className="badge info">Active sub-site: {selectedSchool?.schoolId || 'N/A'}</span>
+                        </div>
+                        <div className="list">
+                          {selectedProjectSchools.map((school) => (
+                            <div className="item" key={school.schoolId}>
+                              <strong>{school.schoolName}</strong> ({school.schoolId}) · meter {school.meter?.deviceId || 'N/A'} ·{' '}
+                              {fmt(school.meter?.latestReadingM3 || 0)} m³ ·{' '}
+                              <StatusPill {...meterMeta(school.meter?.status || 'unknown')} />
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : null}
                   </>
                 ) : null}
                 {projectDetailTab === 'evidence' ? (
@@ -1441,11 +1476,31 @@ export default function Page() {
           <div className="card">
             <h2>Meter Ingestion + Device Layer</h2>
             <p>
-              Selected project: <strong>{selectedProject?.projectId || 'None'}</strong>
-              {selectedSchool ? (
+              Selected project portfolio: <strong>{selectedProject?.projectId || 'None'}</strong>
+              {selectedProjectSchools.length ? (
                 <>
                   {' '}
-                  · device <strong>{selectedSchool.meter.deviceId}</strong> · current reading <strong>{fmt(selectedSchool.meter.latestReadingM3)} m³</strong>
+                  · sub-sites <strong>{selectedProjectSchools.length}</strong> · portfolio reading <strong>{fmt(portfolioReadingM3)} m³</strong>
+                </>
+              ) : null}
+            </p>
+            {selectedProjectSchools.length ? (
+              <div className="row">
+                <select value={selectedSchool?.schoolId || ''} onChange={(e) => selectSchoolProjectBySchoolId(e.target.value)}>
+                  {selectedProjectSchools.map((school) => (
+                    <option key={school.schoolId} value={school.schoolId}>
+                      {school.schoolName} · {school.meter?.deviceId}
+                    </option>
+                  ))}
+                </select>
+                <span className="badge info">Active sub-site for simulation</span>
+              </div>
+            ) : null}
+            <p>
+              {selectedSchool ? (
+                <>
+                  Active sub-site: <strong>{selectedSchool.schoolName}</strong> ({selectedSchool.schoolId}) · device{' '}
+                  <strong>{selectedSchool.meter.deviceId}</strong> · current reading <strong>{fmt(selectedSchool.meter.latestReadingM3)} m³</strong>
                 </>
               ) : null}
             </p>
