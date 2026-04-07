@@ -979,6 +979,7 @@ export default function Page() {
     <main className="page">
       <section className="header">
         <div className="brandIntro">
+          <span className="heroTag">Blue Lifeline Demo Environment</span>
           <a className="brandLogoLink" href="https://bluelifeline.org/" target="_blank" rel="noreferrer" aria-label="Blue Lifeline website">
             <Image
               src="/brand/bluelifeline-logo-wordmark.png"
@@ -1000,6 +1001,14 @@ export default function Page() {
               {demoUrl}
             </a>
           </p>
+          <div className="heroActions">
+            <a className="heroCta heroCtaPrimary" href="https://bluelifeline.org/" target="_blank" rel="noreferrer">
+              Visit Blue Lifeline
+            </a>
+            <a className="heroCta heroCtaGhost" href="#mvp-modules">
+              Explore MVP Modules
+            </a>
+          </div>
         </div>
       </section>
 
@@ -1041,7 +1050,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="stepperWrap card">
+      <section className="stepperWrap card" id="mvp-modules">
         <div className="stepNow">
           <strong>
             Step {currentStep} of {steps.length}: {currentStepMeta.title}
@@ -1773,6 +1782,21 @@ export default function Page() {
           </div>
         </section>
       ) : null}
+
+      <footer className="brandFooter">
+        <div className="brandFooterLeft">
+          <Image src="/brand/bluelifeline-logo-mark.png" alt="Blue Lifeline mark" width={150} height={26} className="brandFooterMark" />
+          <p>Water benefit certification demo console for Blue Lifeline MVP modules.</p>
+        </div>
+        <div className="brandFooterRight">
+          <a href="https://bluelifeline.org/" target="_blank" rel="noreferrer">
+            bluelifeline.org
+          </a>
+          <a href={demoUrl} target="_blank" rel="noreferrer">
+            Live Demo URL
+          </a>
+        </div>
+      </footer>
     </main>
   );
 }
