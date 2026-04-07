@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
@@ -19,12 +19,12 @@ const PROJECT_TYPES = [
 ];
 
 const steps = [
-  { id: 1, title: 'Admin' },
-  { id: 2, title: 'Certification' },
-  { id: 3, title: 'Blockchain' },
-  { id: 4, title: 'Marketplace' },
-  { id: 5, title: 'Customer Account' },
-  { id: 6, title: 'Map' }
+  { id: 1, title: 'Admin', role: 'Admin', summary: 'Project onboarding' },
+  { id: 2, title: 'Certification', role: 'Reviewer', summary: 'Data review' },
+  { id: 3, title: 'Blockchain', role: 'Ledger', summary: 'Issuance controls' },
+  { id: 4, title: 'Marketplace', role: 'Buyer', summary: 'Token purchase' },
+  { id: 5, title: 'Customer Account', role: 'Buyer', summary: 'Retirement + claims' },
+  { id: 6, title: 'Map', role: 'Ops', summary: 'Basin localization' }
 ];
 
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'];
@@ -359,8 +359,10 @@ export default function Page() {
   const [lastReport, setLastReport] = useState(null);
   const [basinError, setBasinError] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [reviewComment, setReviewComment] = useState('');
   const [projectDetailTab, setProjectDetailTab] = useState('overview');
+  const drawerRef = useRef(null);
 
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
 
@@ -614,6 +616,59 @@ export default function Page() {
   );
   const buyerPurchased = useMemo(() => buyerPurchases.reduce((sum, p) => sum + p.quantity, 0), [buyerPurchases]);
   const buyerAvailableBalance = Math.max(0, buyerPurchased - buyerRetired);
+  const currentStageDone = workflowStatus.find((s) => s.label === currentStepMeta.title)?.done || false;
+  const currentStageMeta = currentStageDone
+    ? { tone: 'good', icon: 'check', label: 'Stage Ready' }
+    : { tone: 'warn', icon: 'clock', label: 'Stage In Progress' };
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      if (!mobileMenuOpen) return;
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+      if (event.key === 'Tab' && drawerRef.current) {
+        const focusables = drawerRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      drawerRef.current?.querySelector('button')?.focus();
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  function goToStep(stepId) {
+    setCurrentStep(stepId);
+    setMobileMenuOpen(false);
+  }
+
+  function resetUiState() {
+    setCurrentStep(1);
+    setMobileMenuOpen(false);
+    setChartBasins([]);
+    setReviewComment('');
+    setProjectDetailTab('overview');
+  }
 
   function selectSchoolProjectBySchoolId(schoolId) {
     const school = schools.find((s) => s.schoolId === schoolId);
@@ -976,7 +1031,70 @@ export default function Page() {
   );
 
   return (
-    <main className="page">
+    <>
+      <div
+        className={`mobileBackdrop ${mobileMenuOpen ? 'show' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden={!mobileMenuOpen}
+      />
+      <div className="appShell">
+        <aside
+          ref={drawerRef}
+          id="main-nav-drawer"
+          className={`sideNav ${mobileMenuOpen ? 'open' : ''}`}
+          aria-label="Main navigation"
+          aria-modal={mobileMenuOpen ? 'true' : undefined}
+        >
+          <div className="sideNavHeader">
+            <Image src="/brand/bluelifeline-logo-wordmark.png" alt="Blue Lifeline" width={160} height={28} className="sideNavLogo" />
+            <button className="sideNavClose" onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation">
+              ✕
+            </button>
+          </div>
+          <nav className="sideNavLinks">
+            {steps.map((step) => (
+              <button
+                key={step.id}
+                className={`sideNavLink ${currentStep === step.id ? 'active' : ''}`}
+                onClick={() => goToStep(step.id)}
+              >
+                <span className="sideNavStep">{step.id}</span>
+                <span>
+                  {step.title}
+                  <small>{step.role}</small>
+                </span>
+              </button>
+            ))}
+          </nav>
+          <div className="sideNavFooter">
+            <StatusPill {...currentStageMeta} />
+            <button className="secondary sideNavReset" onClick={resetUiState}>
+              Reset View
+            </button>
+          </div>
+        </aside>
+
+        <div className="appMain">
+          <header className="mobileTopBar">
+            <button
+              className="menuButton"
+              aria-controls="main-nav-drawer"
+              aria-expanded={mobileMenuOpen}
+              aria-label="Open navigation"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              ☰
+            </button>
+            <div>
+              <strong>{currentStepMeta.title}</strong>
+              <p>
+                Step {currentStep} of {steps.length}
+              </p>
+            </div>
+            <span className={`badge ${currentStageDone ? 'good' : 'warn'}`}>{currentStageDone ? 'ready' : 'active'}</span>
+          </header>
+
+          <main className="page">
       <section className="header">
         <div className="brandIntro">
           <span className="heroTag">Blue Lifeline Demo Environment</span>
@@ -1056,6 +1174,8 @@ export default function Page() {
             Step {currentStep} of {steps.length}: {currentStepMeta.title}
           </strong>
           <span className="badge info">{stepProgressPct}%</span>
+          <span className="badge info">{currentStepMeta.role}</span>
+          <StatusPill {...currentStageMeta} />
         </div>
         <div className="stepProgress">
           <div className="stepProgressFill" style={{ width: `${stepProgressPct}%` }} />
@@ -1072,7 +1192,7 @@ export default function Page() {
             </button>
           ))}
         </div>
-        <div className="row">
+        <div className="row desktopStepControls">
           <button className="secondary" disabled={currentStep === 1} onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}>
             Previous
           </button>
@@ -1797,6 +1917,23 @@ export default function Page() {
           </a>
         </div>
       </footer>
-    </main>
+          </main>
+        </div>
+      </div>
+      <div className="mobileStageBar">
+        <button className="secondary" disabled={currentStep === 1} onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}>
+          Previous
+        </button>
+        <div className="mobileStageMeta">
+          <span>
+            Step {currentStep} of {steps.length}
+          </span>
+          <strong>{currentStepMeta.title}</strong>
+        </div>
+        <button disabled={currentStep === steps.length} onClick={() => setCurrentStep((s) => Math.min(steps.length, s + 1))}>
+          Next
+        </button>
+      </div>
+    </>
   );
 }
