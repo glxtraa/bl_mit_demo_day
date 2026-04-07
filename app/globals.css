@@ -772,6 +772,25 @@ button:disabled {
   margin-top: 6px;
 }
 
+.schoolPickerRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.schoolPickerRow input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--brand);
+  flex: 0 0 auto;
+}
+
+.schoolPickerRow span {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .badge {
   display: inline-block;
   padding: 3px 8px;
@@ -854,6 +873,29 @@ button:disabled {
 
 .statusBoard {
   margin-bottom: 12px;
+}
+
+.stageStatusList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.stageStatusItem {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fbfd;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stageStatusItem strong {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  color: #2b506d;
 }
 
 .chartGrid {
@@ -1151,6 +1193,10 @@ button:disabled {
   }
 
   .chartGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stageStatusList {
     grid-template-columns: 1fr;
   }
 

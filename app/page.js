@@ -340,9 +340,12 @@ export default function Page() {
     projectName: '',
     promoter: '',
     projectType: SCHOOL_PROJECT_TYPE,
+    projectScope: 'multi_site_school_system',
+    municipality: '',
+    state: 'Estado de Mexico',
+    country: 'Mexico',
     basinId: '',
-    lat: '',
-    lon: ''
+    linkedSchoolIds: []
   });
   const [simBusy, setSimBusy] = useState(false);
   const [apiDownload, setApiDownload] = useState(null);
@@ -465,6 +468,7 @@ export default function Page() {
     const device = selectedProject.linkedDeviceIds?.[0];
     return schools.find((s) => s.meter?.deviceId === device) || null;
   }, [selectedProject, schools, selectedSchoolId]);
+  const selectedTechnical = selectedSchool?.technical || null;
 
   useEffect(() => {
     if (!selectedProject) return;
@@ -492,6 +496,24 @@ export default function Page() {
     () => selectedProjectSchools.filter((school) => school?.meter?.status === 'online').length,
     [selectedProjectSchools]
   );
+  const projectDossierFiles = useMemo(() => {
+    return selectedProjectSchools.map((school) => {
+      const tech = school.technical || {};
+      const files = [...(tech.reportFiles || [])];
+      if (tech.precipitation?.sourceFile) {
+        files.push({
+          path: tech.precipitation.sourceFile,
+          name: 'Precipitation CSV'
+        });
+      }
+      return {
+        schoolId: school.schoolId,
+        schoolName: school.schoolName,
+        files,
+        imageCount: tech.imageCount || 0
+      };
+    });
+  }, [selectedProjectSchools]);
 
   const basinQuarterAggregates = useMemo(() => certificationData?.aggregates || [], [certificationData]);
   const basinTotals = useMemo(() => certificationData?.basinTotals || [], [certificationData]);
@@ -633,6 +655,134 @@ export default function Page() {
   const currentStageMeta = currentStageDone
     ? { tone: 'good', icon: 'check', label: 'Stage Ready' }
     : { tone: 'warn', icon: 'clock', label: 'Stage In Progress' };
+  const stageStatusItems = useMemo(() => {
+    if (currentStep === 1) {
+      return [
+        {
+          label: 'Project Scope',
+          meta: selectedProject ? { tone: 'good', icon: 'check', label: selectedProject.projectScope || 'Defined' } : { tone: 'warn', icon: 'clock', label: 'Select or create project' }
+        },
+        {
+          label: 'Linked Sub-sites',
+          meta: selectedProjectSchools.length ? { tone: 'good', icon: 'check', label: `${selectedProjectSchools.length} schools linked` } : { tone: 'warn', icon: 'warn', label: 'No school sub-sites linked' }
+        },
+        {
+          label: 'School Documents',
+          meta: projectDossierFiles.some((x) => x.files.length > 0)
+            ? { tone: 'good', icon: 'check', label: `${projectDossierFiles.reduce((sum, x) => sum + x.files.length, 0)} files accessible` }
+            : { tone: 'warn', icon: 'warn', label: 'No dossier files linked yet' }
+        }
+      ];
+    }
+    if (currentStep === 2) {
+      return [
+        {
+          label: 'Certification Source',
+          meta: { tone: 'info', icon: 'doc', label: certificationSourceMode === 'api' ? 'Live API source' : `Uploaded source (${certificationUploadName || 'file'})` }
+        },
+        {
+          label: 'Pipeline Mapping',
+          meta: (certificationData?.pipeline?.mappedToBasins || 0) > 0
+            ? { tone: 'good', icon: 'check', label: `${certificationData.pipeline.mappedToBasins} records mapped` }
+            : { tone: 'warn', icon: 'warn', label: 'No mapped records yet' }
+        },
+        {
+          label: 'Human Review',
+          meta: reviewMeta(reviews[selectedProject?.projectId || '']?.decision)
+        }
+      ];
+    }
+    if (currentStep === 3) {
+      return [
+        {
+          label: 'Basin-Quarter Approval',
+          meta: selectedAggregateApproval ? { tone: 'good', icon: 'check', label: `${selectedBasinId} ${selectedQuarter} approved` } : { tone: 'warn', icon: 'clock', label: 'Aggregate approval required' }
+        },
+        {
+          label: 'Project Certification',
+          meta: reviewMeta(reviews[selectedProject?.projectId || '']?.decision)
+        },
+        {
+          label: 'Issuance Batches',
+          meta: issuances.length ? { tone: 'good', icon: 'check', label: `${issuances.length} issuance batches` } : { tone: 'info', icon: 'doc', label: 'No batches issued yet' }
+        }
+      ];
+    }
+    if (currentStep === 4) {
+      return [
+        {
+          label: 'Tradable Inventory',
+          meta: inventoryRows.length ? { tone: 'good', icon: 'check', label: `${inventoryRows.length} issuance lots` } : { tone: 'warn', icon: 'warn', label: 'No inventory available' }
+        },
+        {
+          label: 'Buyer Eligibility',
+          meta: BUYERS.find((b) => b.id === selectedBuyerId)?.approved
+            ? { tone: 'good', icon: 'check', label: 'Buyer approved' }
+            : { tone: 'warn', icon: 'warn', label: 'Buyer pending approval' }
+        },
+        {
+          label: 'Purchases',
+          meta: purchases.length ? { tone: 'good', icon: 'check', label: `${purchases.length} purchase events` } : { tone: 'info', icon: 'doc', label: 'No purchases yet' }
+        }
+      ];
+    }
+    if (currentStep === 5) {
+      return [
+        {
+          label: 'Buyer Balance',
+          meta: buyerAvailableBalance > 0 ? { tone: 'good', icon: 'check', label: `${fmt(buyerAvailableBalance)} WBT available` } : { tone: 'warn', icon: 'warn', label: 'No retireable balance' }
+        },
+        {
+          label: 'Retirements',
+          meta: retirements.length ? { tone: 'good', icon: 'check', label: `${retirements.length} retirements recorded` } : { tone: 'info', icon: 'doc', label: 'No retirements yet' }
+        },
+        {
+          label: 'Certificate + Report',
+          meta: lastReport ? { tone: 'good', icon: 'check', label: 'Latest report generated' } : { tone: 'warn', icon: 'clock', label: 'Awaiting retirement output' }
+        }
+      ];
+    }
+    return [
+      {
+        label: 'HydroBASINS Layer',
+        meta: (basins?.features?.length || 0) > 0 ? { tone: 'good', icon: 'check', label: `${basins.features.length} basin polygons loaded` } : { tone: 'warn', icon: 'warn', label: 'Basin polygons missing' }
+      },
+      {
+        label: 'Mapped Schools',
+        meta: schools.filter((s) => typeof s.lat === 'number').length > 0
+          ? { tone: 'good', icon: 'check', label: `${schools.filter((s) => typeof s.lat === 'number').length} schools geolocated` }
+          : { tone: 'warn', icon: 'warn', label: 'No geolocated schools' }
+      },
+      {
+        label: 'School Dossier',
+        meta: selectedTechnical?.reportFiles?.length
+          ? { tone: 'good', icon: 'check', label: `${selectedTechnical.reportFiles.length} files for selected school` }
+          : { tone: 'info', icon: 'doc', label: 'Select school to inspect dossier' }
+      }
+    ];
+  }, [
+    currentStep,
+    selectedProject,
+    selectedProjectSchools,
+    projectDossierFiles,
+    certificationSourceMode,
+    certificationUploadName,
+    certificationData,
+    reviews,
+    selectedAggregateApproval,
+    selectedBasinId,
+    selectedQuarter,
+    issuances,
+    inventoryRows,
+    selectedBuyerId,
+    purchases,
+    buyerAvailableBalance,
+    retirements,
+    lastReport,
+    basins,
+    schools,
+    selectedTechnical
+  ]);
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -683,6 +833,16 @@ export default function Page() {
     setProjectDetailTab('overview');
   }
 
+  function toggleNewProjectSchool(schoolId) {
+    setNewProject((prev) => {
+      const already = prev.linkedSchoolIds.includes(schoolId);
+      return {
+        ...prev,
+        linkedSchoolIds: already ? prev.linkedSchoolIds.filter((id) => id !== schoolId) : [...prev.linkedSchoolIds, schoolId]
+      };
+    });
+  }
+
   function selectSchoolProjectBySchoolId(schoolId) {
     const school = schools.find((s) => s.schoolId === schoolId);
     if (!school) return;
@@ -712,28 +872,35 @@ export default function Page() {
 
   function createProject() {
     if (!newProject.projectName.trim()) return;
+    if (!newProject.promoter.trim()) return;
     const id = `BL-PROJ-${String(projects.length + 1).padStart(3, '0')}`;
     const projectTypeLabel = PROJECT_TYPES.find((x) => x.value === newProject.projectType)?.label || newProject.projectType;
+    const linkedSchools = schools.filter((school) => newProject.linkedSchoolIds.includes(school.schoolId));
+    const linkedDeviceIds = [...new Set(linkedSchools.map((school) => school?.meter?.deviceId).filter(Boolean))];
+    const linkedSchoolIds = linkedSchools.map((school) => school.schoolId);
+    const uniqueBasins = [...new Set(linkedSchools.map((school) => school.basinId).filter(Boolean))];
+    const derivedBasinId =
+      newProject.basinId.trim() || (uniqueBasins.length === 1 ? uniqueBasins[0] : uniqueBasins.length > 1 ? 'MULTI-BASIN' : 'UNIDENTIFIED');
     const created = {
       projectId: id,
       projectName: newProject.projectName,
-      promoter: newProject.promoter || 'Unspecified promoter',
+      promoter: newProject.promoter,
       projectType: newProject.projectType,
       projectTypeLabel,
-      projectScope: 'single_site_complex_project',
+      projectScope: newProject.projectScope,
       location: {
-        basinId: newProject.basinId || 'UNIDENTIFIED',
-        municipality: 'Custom',
-        state: 'Estado de Mexico',
-        country: 'Mexico',
-        lat: newProject.lat ? Number(newProject.lat) : null,
-        lon: newProject.lon ? Number(newProject.lon) : null
+        basinId: derivedBasinId,
+        municipality: newProject.municipality || 'Multiple municipalities',
+        state: newProject.state || 'N/A',
+        country: newProject.country || 'N/A',
+        lat: null,
+        lon: null
       },
       operator: 'Demo Admin',
       status: 'draft',
-      linkedDeviceIds: [`tlaloque-${id}`],
-      linkedSchoolIds: [],
-      siteCount: 1,
+      linkedDeviceIds,
+      linkedSchoolIds,
+      siteCount: Math.max(1, linkedSchoolIds.length),
       evidenceFiles: [],
       certificationReviewer: 'Pending assignment',
       methodologyStatus: 'draft',
@@ -741,7 +908,17 @@ export default function Page() {
     };
     setProjects((p) => [created, ...p]);
     setSelectedProjectId(id);
-    setNewProject({ projectName: '', promoter: '', projectType: SCHOOL_PROJECT_TYPE, basinId: '', lat: '', lon: '' });
+    setNewProject({
+      projectName: '',
+      promoter: '',
+      projectType: SCHOOL_PROJECT_TYPE,
+      projectScope: 'multi_site_school_system',
+      municipality: '',
+      state: 'Estado de Mexico',
+      country: 'Mexico',
+      basinId: '',
+      linkedSchoolIds: []
+    });
     addTimeline(`Created project ${id} (${created.projectName}).`);
     recordAudit({ type: 'project_created', projectId: id, projectName: created.projectName });
   }
@@ -1036,7 +1213,6 @@ export default function Page() {
   }
 
   const aiForSelected = selectedProject ? runAiReviewRecommendation(selectedProject) : null;
-  const selectedTechnical = selectedSchool?.technical || null;
   const selectedProjectReview = selectedProject ? reviews[selectedProject.projectId] || null : null;
   const selectedProjectIssuances = useMemo(
     () => (selectedProject ? issuances.filter((x) => x.projectId === selectedProject.projectId) : []),
@@ -1170,7 +1346,10 @@ export default function Page() {
       </section>
 
       <section className="card statusBoard" id="mvp-modules">
-        <h3>Live Status Cues</h3>
+        <h3>{currentStepMeta.title} Stage Status</h3>
+        <p className="subtitle">
+          Operational checkpoints for the active MVP module. These are the minimum items needed before moving to the next stage.
+        </p>
         <div className="workflowStrip">
           {workflowStatus.map((s) => (
             <span key={s.label} className={`workflowItem ${s.done ? 'done' : 'pending'}`}>
@@ -1178,19 +1357,13 @@ export default function Page() {
             </span>
           ))}
         </div>
-        <div className="row">
-          <StatusPill {...statusMeta(selectedProject?.status || 'draft')} />
-          <StatusPill {...meterMeta(selectedSchool?.meter?.status || 'unknown')} />
-          <StatusPill {...reviewMeta(reviews[selectedProject?.projectId || '']?.decision)} />
-          <StatusPill
-            tone={selectedAggregateApproval ? 'good' : 'warn'}
-            icon={selectedAggregateApproval ? 'check' : 'clock'}
-            label={
-              selectedAggregateApproval
-                ? `Aggregate Approved (${selectedBasinId || 'N/A'} ${selectedQuarter})`
-                : `Aggregate Pending (${selectedBasinId || 'N/A'} ${selectedQuarter})`
-            }
-          />
+        <div className="stageStatusList">
+          {stageStatusItems.map((item) => (
+            <div key={item.label} className="stageStatusItem">
+              <strong>{item.label}</strong>
+              <StatusPill {...item.meta} />
+            </div>
+          ))}
         </div>
       </section>
 
@@ -1198,7 +1371,9 @@ export default function Page() {
         <section className="wizardScreen">
           <div className="card">
             <h2>Project Onboarding</h2>
-            <p className="subtitle">Project model supports multi-type onboarding; current school seeds remain SCALL-focused.</p>
+            <p className="subtitle">
+              Define the parent project first, then link one or many school sub-sites. Basin and device metadata can be derived from linked schools.
+            </p>
             <div className="row">
               <input
                 value={newProject.projectName}
@@ -1219,14 +1394,42 @@ export default function Page() {
               </select>
             </div>
             <div className="row">
+              <select value={newProject.projectScope} onChange={(e) => setNewProject((x) => ({ ...x, projectScope: e.target.value }))}>
+                <option value="multi_site_school_system">Multi-site school system</option>
+                <option value="single_site_complex_project">Single site project</option>
+              </select>
+              <input
+                value={newProject.municipality}
+                placeholder="Municipality / region"
+                onChange={(e) => setNewProject((x) => ({ ...x, municipality: e.target.value }))}
+              />
+              <input value={newProject.state} placeholder="State" onChange={(e) => setNewProject((x) => ({ ...x, state: e.target.value }))} />
+              <input value={newProject.country} placeholder="Country" onChange={(e) => setNewProject((x) => ({ ...x, country: e.target.value }))} />
+            </div>
+            <div className="row">
               <input
                 value={newProject.basinId}
-                placeholder="Basin ID"
+                placeholder="Declared basin ID (optional)"
                 onChange={(e) => setNewProject((x) => ({ ...x, basinId: e.target.value }))}
               />
-              <input value={newProject.lat} placeholder="Lat" onChange={(e) => setNewProject((x) => ({ ...x, lat: e.target.value }))} />
-              <input value={newProject.lon} placeholder="Lon" onChange={(e) => setNewProject((x) => ({ ...x, lon: e.target.value }))} />
               <button onClick={createProject}>Create project</button>
+            </div>
+            <div className="row">
+              <span className="badge info">Linked sub-sites selected: {newProject.linkedSchoolIds.length}</span>
+              <span className="badge info">Derived basin: auto from linked schools (or declared basin)</span>
+            </div>
+            <div className="list">
+              {schools.map((school) => {
+                const checked = newProject.linkedSchoolIds.includes(school.schoolId);
+                return (
+                  <label key={school.schoolId} className="item schoolPickerRow">
+                    <input type="checkbox" checked={checked} onChange={() => toggleNewProjectSchool(school.schoolId)} />
+                    <span>
+                      <strong>{school.schoolName}</strong> ({school.schoolId}) · basin {school.basinId} · meter {school.meter?.deviceId || 'N/A'}
+                    </span>
+                  </label>
+                );
+              })}
             </div>
 
             <div className="list">
@@ -1324,19 +1527,30 @@ export default function Page() {
                   <>
                     <div className="row">
                       <span className="badge info">Evidence files: {selectedProject.evidenceFiles?.length || 0}</span>
-                      <span className="badge info">Dossier reports: {selectedTechnical?.pdfCount || 0}</span>
-                      <span className="badge info">Dossier photos: {selectedTechnical?.imageCount || 0}</span>
+                      <span className="badge info">
+                        School dossier files: {projectDossierFiles.reduce((sum, school) => sum + school.files.length, 0)}
+                      </span>
+                      <span className="badge info">Linked schools with dossiers: {projectDossierFiles.filter((school) => school.files.length).length}</span>
                     </div>
                     <div className="list">
-                      {(selectedTechnical?.reportFiles || []).length === 0 ? (
-                        <div className="item">No dossier evidence linked to this project.</div>
+                      {projectDossierFiles.every((school) => school.files.length === 0) ? (
+                        <div className="item">No school dossier files linked to this project yet.</div>
                       ) : (
-                        (selectedTechnical?.reportFiles || []).map((file) => (
-                          <div className="item" key={file.path}>
-                            <strong>{file.name}</strong>{' '}
-                            <a href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`} target="_blank" rel="noreferrer">
-                              Download
-                            </a>
+                        projectDossierFiles.map((school) => (
+                          <div className="item" key={school.schoolId}>
+                            <strong>
+                              {school.schoolName} ({school.schoolId})
+                            </strong>{' '}
+                            <span className="badge info">{school.files.length} files</span>{' '}
+                            <span className="badge info">{school.imageCount} photos</span>
+                            <div className="row" style={{ marginTop: 6 }}>
+                              {school.files.length === 0 ? <span className="badge warn">No linked files</span> : null}
+                              {school.files.map((file) => (
+                                <a key={file.path} href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`} target="_blank" rel="noreferrer">
+                                  {file.name || file.path.split('/').pop()}
+                                </a>
+                              ))}
+                            </div>
                           </div>
                         ))
                       )}
