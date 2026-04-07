@@ -16,7 +16,7 @@ Reference: `Blue_Lifeline_MVP_Webapp_Product_Definition_Concise.docx.md`
 | Certification reviews project data | Implemented | Step 4 certification workspace + AI assist + reviewer controls |
 | Human approval is explicit | Implemented | Step 4 `Human approve / Request info / Reject` + review record metadata |
 | WBT issuance from approved certification | Implemented | Step 5 issuance gated by review + aggregate approval |
-| Offtaker purchase/buyer action | Partial | Permissioned buyer + retirement flow present; no separate purchase checkout screen |
+| Offtaker purchase/buyer action | Implemented | Step 6 marketplace inventory filters + issuance-batch purchase action |
 | Retirement and reporting | Implemented | Step 6 retirement + Step 7 report/certificate payload |
 
 ## B. Detailed feature traceability
@@ -35,7 +35,7 @@ Reference: `Blue_Lifeline_MVP_Webapp_Product_Definition_Concise.docx.md`
 | 4.4 Issuance engine | Approval dependency before issuance | Implemented | Requires project review + aggregate approval |
 | 4.4 Issuance engine | Issuance records with trace fields | Implemented | Issuance includes project/basin/quarter/reviewer/method/version |
 | 4.5 Permissioned buyer | Unapproved users blocked | Implemented | Retirement blocked for unapproved buyer |
-| 4.5 Permissioned buyer | Buyer sees source metadata | Partial | Source shown in issuance/batch text; no full buyer metadata page |
+| 4.5 Permissioned buyer | Buyer sees source metadata | Implemented | Step 6 inventory cards show batch/project/basin/type/promoter source fields |
 | 4.6 Retirement | Irreversible retirement flow + before/after balance | Implemented | Step 6 flow + KPI balances |
 | 4.7 Reporting | Report generated immediately with required fields | Implemented | `/api/reports` and Step 7 output |
 
@@ -70,7 +70,6 @@ Reference: `Blue_Lifeline_MVP_Webapp_Product_Definition_Concise.docx.md`
 
 ## F. Known gaps for next pass
 
-1. Dedicated marketplace purchase UI (currently simplified in buyer/retirement flow).
-2. Rich project detail page with first-class evidence and issuance history tabs.
-3. Durable storage replacing `/tmp` for production-like persistence.
-4. Full blockchain ledger adapter visibility (currently demo-grade issuance records).
+1. Rich project detail page with first-class evidence and issuance history tabs (currently snapshot-style panel).
+2. Durable storage replacing `/tmp` for production-like persistence.
+3. Full blockchain ledger adapter visibility (currently demo-grade issuance records).

@@ -43,8 +43,11 @@
 - Uses `eligibleVolume = aggregatedUtilizadoM3 * 0.85`.
 
 6. Buyer + retirement (Step 6)
-- Permissioned buyer constraint enforced.
-- Retirement updates balance and produces certificate/report payload.
+- Permissioned buyer marketplace flow:
+  - filter issuance inventory by basin, project type, promoter
+  - purchase WBT from issuance batches
+  - buyer holdings tracking
+- Retirement now consumes buyer holdings and then produces certificate/report payload.
 
 7. Certificate + audit (Step 7)
 - Stores report via `/api/reports`.

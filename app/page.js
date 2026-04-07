@@ -327,8 +327,14 @@ export default function Page() {
   const [retirements, setRetirements] = useState([]);
   const [timeline, setTimeline] = useState([]);
   const [selectedBuyerId, setSelectedBuyerId] = useState(BUYERS[0].id);
+  const [selectedIssuanceId, setSelectedIssuanceId] = useState('');
+  const [purchaseQty, setPurchaseQty] = useState('10');
   const [retireQty, setRetireQty] = useState('10');
   const [retirePurpose, setRetirePurpose] = useState('Demo day retirement claim');
+  const [purchases, setPurchases] = useState([]);
+  const [marketFilterBasin, setMarketFilterBasin] = useState('');
+  const [marketFilterType, setMarketFilterType] = useState('');
+  const [marketFilterPromoter, setMarketFilterPromoter] = useState('');
   const [newProject, setNewProject] = useState({
     projectName: '',
     promoter: '',
@@ -353,6 +359,7 @@ export default function Page() {
   const [basinError, setBasinError] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [reviewComment, setReviewComment] = useState('');
+  const [projectDetailTab, setProjectDetailTab] = useState('overview');
 
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL || '/';
 
@@ -562,8 +569,46 @@ export default function Page() {
   );
 
   const totalIssued = useMemo(() => issuances.reduce((sum, x) => sum + x.quantity, 0), [issuances]);
+  const totalPurchased = useMemo(() => purchases.reduce((sum, x) => sum + x.quantity, 0), [purchases]);
   const totalRetired = useMemo(() => retirements.reduce((sum, x) => sum + x.quantity, 0), [retirements]);
   const availableBalance = Math.max(0, totalIssued - totalRetired);
+  const purchasedByIssuance = useMemo(() => {
+    const map = new Map();
+    for (const p of purchases) {
+      map.set(p.issuanceId, (map.get(p.issuanceId) || 0) + p.quantity);
+    }
+    return map;
+  }, [purchases]);
+  const inventoryRows = useMemo(() => {
+    return issuances.map((x) => {
+      const purchased = purchasedByIssuance.get(x.issuanceId) || 0;
+      const availableToBuy = Math.max(0, x.quantity - purchased);
+      const project = projects.find((p) => p.projectId === x.projectId);
+      return {
+        ...x,
+        purchased,
+        availableToBuy,
+        promoter: project?.promoter || project?.operator || 'Unknown',
+        projectType: project?.projectType || '',
+        projectTypeLabel: project?.projectTypeLabel || ''
+      };
+    });
+  }, [issuances, purchasedByIssuance, projects]);
+  const filteredInventory = useMemo(() => {
+    return inventoryRows.filter((x) => {
+      if (marketFilterBasin && String(x.basinId) !== String(marketFilterBasin)) return false;
+      if (marketFilterType && String(x.projectType) !== String(marketFilterType)) return false;
+      if (marketFilterPromoter && !String(x.promoter || '').toLowerCase().includes(marketFilterPromoter.toLowerCase())) return false;
+      return true;
+    });
+  }, [inventoryRows, marketFilterBasin, marketFilterType, marketFilterPromoter]);
+  const buyerPurchases = useMemo(() => purchases.filter((p) => p.buyerId === selectedBuyerId), [purchases, selectedBuyerId]);
+  const buyerRetired = useMemo(
+    () => retirements.filter((r) => r.buyerId === selectedBuyerId).reduce((sum, r) => sum + r.quantity, 0),
+    [retirements, selectedBuyerId]
+  );
+  const buyerPurchased = useMemo(() => buyerPurchases.reduce((sum, p) => sum + p.quantity, 0), [buyerPurchases]);
+  const buyerAvailableBalance = Math.max(0, buyerPurchased - buyerRetired);
 
   function selectSchoolProjectBySchoolId(schoolId) {
     const school = schools.find((s) => s.schoolId === schoolId);
@@ -732,6 +777,7 @@ export default function Page() {
     };
 
     setIssuances((x) => [batch, ...x]);
+    setSelectedIssuanceId((prev) => prev || batch.issuanceId);
     addTimeline(`Issued ${quantity} WBT from basin ${batch.basinId} ${batch.quarter} aggregate.`);
     recordAudit({
       type: 'issuance_created',
@@ -742,6 +788,36 @@ export default function Page() {
       quantity: batch.quantity,
       reviewer: batch.reviewer,
       methodologyVersion: batch.methodologyVersion
+    });
+  }
+
+  function purchaseWbtFromBatch() {
+    const buyer = BUYERS.find((b) => b.id === selectedBuyerId);
+    const qty = Number(purchaseQty);
+    const batch = filteredInventory.find((x) => x.issuanceId === selectedIssuanceId) || inventoryRows.find((x) => x.issuanceId === selectedIssuanceId);
+    if (!buyer?.approved || !batch || !qty || qty <= 0 || qty > batch.availableToBuy) {
+      addTimeline('Purchase blocked: buyer approval, batch selection, or quantity constraints not satisfied.');
+      return;
+    }
+
+    const purchase = {
+      purchaseId: `BUY-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+      buyerId: buyer.id,
+      buyer: buyer.name,
+      issuanceId: batch.issuanceId,
+      projectId: batch.projectId,
+      basinId: batch.basinId,
+      quantity: qty,
+      at: new Date().toISOString()
+    };
+    setPurchases((prev) => [purchase, ...prev]);
+    addTimeline(`${buyer.name} purchased ${qty} WBT from ${batch.issuanceId}.`);
+    recordAudit({
+      type: 'purchase_created',
+      purchaseId: purchase.purchaseId,
+      buyer: purchase.buyer,
+      issuanceId: purchase.issuanceId,
+      quantity: purchase.quantity
     });
   }
 
@@ -810,14 +886,16 @@ export default function Page() {
   async function retireWbt() {
     const buyer = BUYERS.find((b) => b.id === selectedBuyerId);
     const qty = Number(retireQty);
-    if (!buyer?.approved || !qty || qty <= 0 || qty > availableBalance) {
+    if (!buyer?.approved || !qty || qty <= 0 || qty > buyerAvailableBalance) {
       addTimeline('Retirement blocked: buyer approval/balance constraints not satisfied.');
       return;
     }
 
-    const sourceIssuance = issuances[0];
+    const sourcePurchase = buyerPurchases[0];
+    const sourceIssuance = issuances.find((x) => x.issuanceId === sourcePurchase?.issuanceId) || issuances[0];
     const retirement = {
       retirementId: `RET-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+      buyerId: buyer.id,
       buyer: buyer.name,
       quantity: qty,
       purpose: retirePurpose,
@@ -876,6 +954,11 @@ export default function Page() {
 
   const aiForSelected = selectedProject ? runAiReviewRecommendation(selectedProject) : null;
   const selectedTechnical = selectedSchool?.technical || null;
+  const selectedProjectReview = selectedProject ? reviews[selectedProject.projectId] || null : null;
+  const selectedProjectIssuances = useMemo(
+    () => (selectedProject ? issuances.filter((x) => x.projectId === selectedProject.projectId) : []),
+    [issuances, selectedProject]
+  );
 
   return (
     <main className="page">
@@ -1040,6 +1123,94 @@ export default function Page() {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="card">
+            <h2>1b) Project Detail Snapshot</h2>
+            {!selectedProject ? (
+              <p>Select a project to see detail, evidence, and issuance links.</p>
+            ) : (
+              <>
+                <div className="tabRow">
+                  {[
+                    { id: 'overview', label: 'Overview' },
+                    { id: 'evidence', label: 'Evidence' },
+                    { id: 'certification', label: 'Certification' },
+                    { id: 'issuance', label: 'Issuance' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      className={`tabChip ${projectDetailTab === tab.id ? 'active' : ''}`}
+                      onClick={() => setProjectDetailTab(tab.id)}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                <p>
+                  <strong>{selectedProject.projectId}</strong> · {selectedProject.projectName}
+                </p>
+                {projectDetailTab === 'overview' ? (
+                  <>
+                    <div className="row">
+                      <span className="badge info">Promoter: {selectedProject.promoter || selectedProject.operator || 'N/A'}</span>
+                      <span className="badge info">Type: {selectedProject.projectTypeLabel || selectedProject.projectType}</span>
+                      <span className="badge info">Basin: {selectedProject.location?.basinId || 'N/A'}</span>
+                      <span className="badge info">Device: {selectedProject.linkedDeviceIds?.[0] || 'N/A'}</span>
+                    </div>
+                    <div className="row">
+                      <span className="badge info">Status: {selectedProject.status || 'N/A'}</span>
+                      <span className="badge info">Method status: {selectedProject.methodologyStatus || 'N/A'}</span>
+                      <span className="badge info">Reviewer: {selectedProject.certificationReviewer || 'N/A'}</span>
+                    </div>
+                  </>
+                ) : null}
+                {projectDetailTab === 'evidence' ? (
+                  <>
+                    <div className="row">
+                      <span className="badge info">Evidence files: {selectedProject.evidenceFiles?.length || 0}</span>
+                      <span className="badge info">Dossier reports: {selectedTechnical?.pdfCount || 0}</span>
+                      <span className="badge info">Dossier photos: {selectedTechnical?.imageCount || 0}</span>
+                    </div>
+                    <div className="list">
+                      {(selectedTechnical?.reportFiles || []).length === 0 ? (
+                        <div className="item">No dossier evidence linked to this project.</div>
+                      ) : (
+                        (selectedTechnical?.reportFiles || []).map((file) => (
+                          <div className="item" key={file.path}>
+                            <strong>{file.name}</strong>{' '}
+                            <a href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`} target="_blank" rel="noreferrer">
+                              Download
+                            </a>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : null}
+                {projectDetailTab === 'certification' ? (
+                  <>
+                    <div className="row">
+                      <StatusPill {...reviewMeta(selectedProjectReview?.decision)} />
+                      <span className="badge info">Method version: {selectedProjectReview?.methodologyVersion || METHOD_VERSION}</span>
+                    </div>
+                    <div className="code">{JSON.stringify(selectedProjectReview || { message: 'No certification review yet.' }, null, 2)}</div>
+                  </>
+                ) : null}
+                {projectDetailTab === 'issuance' ? (
+                  <div className="list">
+                    {selectedProjectIssuances.length === 0 ? (
+                      <div className="item">No issuance history for this project.</div>
+                    ) : (
+                      selectedProjectIssuances.map((x) => (
+                        <div className="item" key={x.issuanceId}>
+                          <strong>{x.issuanceId}</strong> · basin {x.basinId} · {x.quarter} · {fmt(x.quantity)} WBT · {x.period}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
         </section>
       ) : null}
@@ -1448,7 +1619,7 @@ export default function Page() {
       {currentStep === 6 ? (
         <section className="wizardScreen">
           <div className="card">
-            <h2>6) Permissioned Buyer + Retirement</h2>
+            <h2>6) Permissioned Buyer Marketplace</h2>
             <div className="row">
               <select value={selectedBuyerId} onChange={(e) => setSelectedBuyerId(e.target.value)}>
                 {BUYERS.map((b) => (
@@ -1457,14 +1628,77 @@ export default function Page() {
                   </option>
                 ))}
               </select>
+              <input value={marketFilterPromoter} onChange={(e) => setMarketFilterPromoter(e.target.value)} placeholder="Filter promoter" />
+            </div>
+            <div className="row">
+              <select value={marketFilterBasin} onChange={(e) => setMarketFilterBasin(e.target.value)}>
+                <option value="">All basins</option>
+                {[...new Set(inventoryRows.map((x) => String(x.basinId)))].map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+              <select value={marketFilterType} onChange={(e) => setMarketFilterType(e.target.value)}>
+                <option value="">All project types</option>
+                {[...new Set(inventoryRows.map((x) => String(x.projectType)).filter(Boolean))].map((t) => (
+                  <option key={t} value={t}>
+                    {PROJECT_TYPES.find((x) => x.value === t)?.label || t}
+                  </option>
+                ))}
+              </select>
+              <select value={selectedIssuanceId} onChange={(e) => setSelectedIssuanceId(e.target.value)}>
+                <option value="">Select issuance batch</option>
+                {filteredInventory.map((x) => (
+                  <option key={x.issuanceId} value={x.issuanceId}>
+                    {x.issuanceId} · {x.projectId} · available {fmt(x.availableToBuy)}
+                  </option>
+                ))}
+              </select>
+              <input value={purchaseQty} onChange={(e) => setPurchaseQty(e.target.value)} placeholder="Purchase quantity" />
+              <button onClick={purchaseWbtFromBatch}>Purchase WBT</button>
+            </div>
+            <div className="row">
+              <span className="badge info">Issued total: {fmt(totalIssued)}</span>
+              <span className="badge info">Purchased total: {fmt(totalPurchased)}</span>
+              <span className="badge info">Buyer holdings: {fmt(buyerAvailableBalance)}</span>
+            </div>
+            <div className="list">
+              {filteredInventory.length === 0 ? (
+                <div className="item">No inventory matches current filters.</div>
+              ) : (
+                filteredInventory.map((x) => (
+                  <div className="item stateItem info" key={x.issuanceId}>
+                    <strong>{x.issuanceId}</strong> · {x.projectId} · basin {x.basinId} · {x.projectTypeLabel || x.projectType} · promoter {x.promoter} ·
+                    available {fmt(x.availableToBuy)} / issued {fmt(x.quantity)}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>6b) Buyer Retirement</h2>
+            <div className="row">
               <input value={retireQty} onChange={(e) => setRetireQty(e.target.value)} placeholder="Quantity" />
             </div>
             <textarea value={retirePurpose} rows={3} onChange={(e) => setRetirePurpose(e.target.value)} />
             <div className="row">
               <button onClick={retireWbt}>Retire WBT</button>
-              <span className="badge info">before: {fmt(availableBalance)} WBT available</span>
+              <span className="badge info">buyer available: {fmt(buyerAvailableBalance)} WBT</span>
             </div>
             <div className="list">
+              {buyerPurchases.length === 0 ? (
+                <div className="item">No purchases for selected buyer yet.</div>
+              ) : (
+                buyerPurchases.map((p) => (
+                  <div className="item" key={p.purchaseId}>
+                    <strong>{p.purchaseId}</strong> · {p.issuanceId} · {fmt(p.quantity)} WBT
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="list" style={{ marginTop: 10 }}>
               {retirements.length === 0 ? (
                 <div className="item">No retirement events yet.</div>
               ) : (
