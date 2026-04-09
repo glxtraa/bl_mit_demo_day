@@ -817,6 +817,11 @@ button:disabled {
   display: block;
 }
 
+.selectedSchoolDocs {
+  margin-bottom: 10px;
+  background: #f7fbfe;
+}
+
 .badge {
   display: inline-block;
   padding: 3px 8px;

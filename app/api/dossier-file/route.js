@@ -13,12 +13,13 @@ function contentTypeFor(filePath) {
   if (ext === '.csv') return 'text/csv; charset=utf-8';
   if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
   if (ext === '.png') return 'image/png';
+  if (ext === '.webp') return 'image/webp';
   return 'application/octet-stream';
 }
 
 function dispositionFor(filePath) {
   const ext = path.extname(filePath).toLowerCase();
-  if (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.pdf') {
+  if (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.webp' || ext === '.pdf') {
     return 'inline';
   }
   return 'attachment';
@@ -26,6 +27,7 @@ function dispositionFor(filePath) {
 
 export async function GET(request) {
   const relPath = request.nextUrl.searchParams.get('path');
+  const forceInline = request.nextUrl.searchParams.get('inline') === '1';
   if (!relPath) {
     return NextResponse.json({ error: 'Missing query parameter: path' }, { status: 400 });
   }
@@ -46,7 +48,7 @@ export async function GET(request) {
     status: 200,
     headers: {
       'content-type': contentTypeFor(absolutePath),
-      'content-disposition': `${dispositionFor(absolutePath)}; filename="${fileName}"`,
+      'content-disposition': `${forceInline ? 'inline' : dispositionFor(absolutePath)}; filename="${fileName}"`,
       'cache-control': 'no-store'
     }
   });

@@ -521,6 +521,10 @@ export default function Page() {
       };
     });
   }, [selectedProjectSchools]);
+  const selectedSchoolDossier = useMemo(() => {
+    if (!selectedSchool) return null;
+    return projectDossierFiles.find((school) => school.schoolId === selectedSchool.schoolId) || null;
+  }, [projectDossierFiles, selectedSchool]);
   const projectSchoolsPerPage = 10;
   const projectSchoolsTotalPages = Math.max(1, Math.ceil(selectedProjectSchools.length / projectSchoolsPerPage));
   const pagedProjectSchools = useMemo(() => {
@@ -1584,6 +1588,48 @@ export default function Page() {
                       </span>
                       <span className="badge info">Linked schools with dossiers: {projectDossierFiles.filter((school) => school.files.length).length}</span>
                     </div>
+                    {selectedSchoolDossier ? (
+                      <div className="card selectedSchoolDocs">
+                        <h3 style={{ marginBottom: 6 }}>
+                          Selected School Documents: {selectedSchoolDossier.schoolName} ({selectedSchoolDossier.schoolId})
+                        </h3>
+                        <div className="row">
+                          <span className="badge info">{selectedSchoolDossier.files.length} linked files</span>
+                          <span className="badge info">{selectedSchoolDossier.imageCount} photos</span>
+                        </div>
+                        <div className="row">
+                          {selectedSchoolDossier.files.length === 0 ? (
+                            <span className="badge warn">No linked files</span>
+                          ) : (
+                            selectedSchoolDossier.files.map((file) => (
+                              <a key={file.path} href={`/api/dossier-file?path=${encodeURIComponent(file.path)}`} target="_blank" rel="noreferrer">
+                                {file.name || file.path.split('/').pop()}
+                              </a>
+                            ))
+                          )}
+                        </div>
+                        {selectedSchoolDossier.photoSamples?.length ? (
+                          <div className="photoGrid">
+                            {selectedSchoolDossier.photoSamples.slice(0, 12).map((photoPath) => (
+                              <a
+                                key={photoPath}
+                                href={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="photoThumbLink"
+                              >
+                                <img
+                                  src={`/api/dossier-file?path=${encodeURIComponent(photoPath)}&inline=1`}
+                                  alt={`${selectedSchoolDossier.schoolName} dossier sample`}
+                                  className="photoThumb"
+                                  loading="lazy"
+                                />
+                              </a>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <div className="list projectDetailList">
                       {projectDossierFiles.every((school) => school.files.length === 0) ? (
                         <div className="item">No school dossier files linked to this project yet.</div>
@@ -1639,7 +1685,7 @@ export default function Page() {
                                     className="photoThumbLink"
                                   >
                                     <img
-                                      src={`/api/dossier-file?path=${encodeURIComponent(photoPath)}`}
+                                      src={`/api/dossier-file?path=${encodeURIComponent(photoPath)}&inline=1`}
                                       alt={`${school.schoolName} dossier sample`}
                                       className="photoThumb"
                                       loading="lazy"
